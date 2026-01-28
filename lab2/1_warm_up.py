@@ -7,7 +7,6 @@ xmid = screenWidth // 2
 ymid = screenHeight // 2
 y_thrid_q = screenHeight * 3 // 4
 x_thrid_q = screenWidth * 3 // 4
-init_window(screenWidth, screenHeight, "warm-up")
 
 XP = 60 # x padding
 YP = 30 # y padding
@@ -31,6 +30,7 @@ def summon_triangles(tops: list[Vector2], height: float, width: float):
                       Vector2(xl, y),
                       Vector2(xr, y),
                       YELLOW)
+init_window(screenWidth, screenHeight, "warm-up")
 
 set_target_fps(60)
 
