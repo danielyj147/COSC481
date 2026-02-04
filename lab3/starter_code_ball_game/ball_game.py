@@ -53,11 +53,11 @@ class Ball():
         # Check walls collision for bouncing
         if(self.pos.x > WINDOW_WIDTH):
             # increment right score by 1
-            pass
+            self.pos = Vector2(WINDOW_WIDTH//2, WINDOW_HEIGHT//2)
+            
         if(self.pos.x <= 0):
             # set score
-            pass
-            # respawn
+            self.pos = Vector2(WINDOW_WIDTH//2, WINDOW_HEIGHT//2)
             
 
 
