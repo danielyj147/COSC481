@@ -9,11 +9,11 @@ if __name__ == '__main__':
   set_target_fps(120)
 
   current_game.startup()
-
+  
   while not window_should_close():
 
     current_game.update()
-      
+    
     begin_drawing()
     clear_background(PINK)
 
