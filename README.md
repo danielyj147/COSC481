@@ -1,5 +1,7 @@
 # COSC 481: Playful Thinking, Serious Coding
 
+![quokka](./assets/quokka.png)
+
 **Spring 2026**
 
 **Instructor:** Professor Elodie Fourquet
