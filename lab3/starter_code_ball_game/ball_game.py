@@ -9,8 +9,10 @@ class Ball():
         self.velocity:Vector2 = velocity
 
     def update(self, player:Rectangle, enemy: Rectangle):
-        self.pos.x += self.velocity.x
-        self.pos.y += self.velocity.y
+        dt = get_frame_time()
+
+        self.pos.x += self.velocity.x * dt
+        self.pos.y += self.velocity.y * dt
 
         if CheckCollisionCircleRec(self.pos, self.radius, player):
             self.velocity.x *= -1
@@ -36,14 +38,14 @@ class Game:
     # where game assets/resources will be initialized
     def startup(self):
         self.enemy_vision = get_screen_width()//2
-        self.ball = Ball(10, Vector2(get_screen_width()//2, get_screen_height()//2), Vector2(2.0, 2.5))
+        self.ball = Ball(10, Vector2(get_screen_width()//2, get_screen_height()//2), Vector2(200, 250))
         self.enemy = Rectangle(50, get_screen_height()//2, PEDDLE_WIDTH, PEDDLE_HEIGHT)
         self.player = Rectangle(get_screen_width()-50, get_screen_height()//2, PEDDLE_WIDTH, PEDDLE_HEIGHT)
         
 
 
     def update(self):
-       if is_key_pressed(KeyboardKey.KEY_P):
+       if is_key_pressed(KeyboardKey.KEY_S):
            self.moving = not self.moving
            
        if self.moving: 
