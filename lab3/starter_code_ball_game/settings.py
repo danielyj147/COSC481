@@ -1,3 +1,6 @@
+"""
+Authors: Daniel Jeong, Sebastian Cole
+"""
 from pyray import *
 from raylib import *
 from random import randint, uniform

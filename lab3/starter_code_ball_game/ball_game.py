@@ -1,3 +1,6 @@
+"""
+Authors: Daniel Jeong, Sebastian Cole
+"""
 from pyray import *
 from os.path import join
 from settings import * 

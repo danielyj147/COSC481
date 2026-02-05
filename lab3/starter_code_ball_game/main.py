@@ -1,3 +1,6 @@
+"""
+Authors: Daniel Jeong, Sebastian Cole
+"""
 from raylib import *
 from ball_game import *
 from settings import * 
