@@ -12,6 +12,8 @@ import pyray
 from pathlib import Path
 
 THIS_DIR = Path(__file__).resolve().parent
+TEXTURE_PATH = f"{THIS_DIR}/resources/man_walking.png"
+SCENE_NUM = 8
 
 MAX_FRAME_SPEED = 15
 MIN_FRAME_SPEED = 1
@@ -25,10 +27,13 @@ pyray.init_window(screenWidth, screenHeight, "raylib [texture] example - sprite 
 # Important NOTE: Textures MUST be loaded after Window initialization 
 # (OpenGL context is required)
 # Texture loading: one step vs. two steps (see other example)
-scarfy = pyray.load_texture(str(THIS_DIR/"resources/scarfy.png"))  
+texture = pyray.load_texture(TEXTURE_PATH)
+scale = (screenWidth-30)/texture.width
+texture.width = int(texture.width * scale)
+texture.height = int(texture.height * scale)
 
 position = pyray.Vector2(350.0, 280.0)
-frameRec = pyray.Rectangle(0.0, 0.0, float(scarfy.width)/6, float(scarfy.height))
+frameRec = pyray.Rectangle(0.0, 0.0, float(texture.width)/SCENE_NUM, float(texture.height))
 currentFrame = 0
 
 framesCounter = 0
@@ -45,10 +50,10 @@ while not pyray.window_should_close():  # Detect window close button or ESC key
         framesCounter = 0
         currentFrame += 1
 
-        if currentFrame > 5:
+        if currentFrame > SCENE_NUM-1:
             currentFrame = 0
 
-        frameRec.x = float(currentFrame) * float(scarfy.width)/6
+        frameRec.x = float(currentFrame) * float(texture.width)/SCENE_NUM
 
     # Control frames speed
     if pyray.is_key_pressed(pyray.KeyboardKey.KEY_RIGHT):
@@ -66,8 +71,8 @@ while not pyray.window_should_close():  # Detect window close button or ESC key
     
     pyray.clear_background(pyray.RAYWHITE)
     
-    pyray.draw_texture(scarfy, 15, 40, pyray.WHITE)
-    pyray.draw_rectangle_lines(15, 40, scarfy.width, scarfy.height, pyray.LIME)
+    pyray.draw_texture(texture, 15, 40, pyray.WHITE)
+    pyray.draw_rectangle_lines(15, 40, texture.width, texture.height, pyray.LIME)
     pyray.draw_rectangle_lines(15 + int(frameRec.x), 40 + int(frameRec.y), 
                            int(frameRec.width), int(frameRec.height), pyray.RED)
     
@@ -82,12 +87,12 @@ while not pyray.window_should_close():  # Detect window close button or ESC key
         #draw_rectangle_lines(250 + 21*i, 205, 20, 20, MAROON)
 
     # Draw part of the texture
-    pyray.draw_texture_rec(scarfy, frameRec, position, pyray.WHITE)  
+    pyray.draw_texture_rec(texture, frameRec, position, pyray.WHITE)  
     
-    pyray.draw_text("(c) Scarfy sprite by Eiden Marsal", screenWidth - 200,
+    pyray.draw_text("(c) texture sprite by Eiden Marsal", screenWidth - 200,
                screenHeight - 20, 10, pyray.GRAY)
     pyray.end_drawing()
 
 # De-Initialization
-pyray.unload_texture(scarfy)  # Texture unloading
+pyray.unload_texture(texture)  # Texture unloading
 pyray.close_window()  # Close window and OpenGL context
