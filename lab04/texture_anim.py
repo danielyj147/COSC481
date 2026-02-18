@@ -12,8 +12,15 @@ import pyray
 from pathlib import Path
 
 THIS_DIR = Path(__file__).resolve().parent
+
 TEXTURE_PATH = f"{THIS_DIR}/resources/man_walking.png"
 SCENE_NUM = 8
+
+# TEXTURE_PATH = f"{THIS_DIR}/resources/girl_running.png"
+# SCENE_NUM = 8
+
+# TEXTURE_PATH = f"{THIS_DIR}/resources/scarfy.png"
+# SCENE_NUM = 6
 
 MAX_FRAME_SPEED = 15
 MIN_FRAME_SPEED = 1
