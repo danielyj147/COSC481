@@ -1,12 +1,12 @@
 import pyray
 from os.path import join
 from settings import * 
+from pathlib import Path
 
 class Character():
     def __init__(self):
         self.pos = pyray.Vector2(WINDOW_WIDTH//2, WINDOW_HEIGHT)
         self.speed = 200 # 200 pixels/sec
-        self.scale=4
 
         self.gravity = 4
         self.y_vel = 0
@@ -17,8 +17,12 @@ class Character():
 
     def startup(self):
         # be careful path: how you run?>
-        self.texture = pyray.load_texture('lab04/resources/cat.png')
-        self.ground = WINDOW_HEIGHT - self.texture.height*self.scale 
+        THIS_DIR = Path(__file__).resolve().parent
+        TEXTURE_PATH = f"{THIS_DIR}/resources/z.png"
+        self.texture = pyray.load_texture(TEXTURE_PATH)
+        self.texture.height = 100
+        self.texture.width = 100
+        self.ground = WINDOW_HEIGHT - self.texture.height
         self.pos.y = self.ground
 
     def update(self):
@@ -38,8 +42,8 @@ class Character():
         self.pos.x += motion.x * pyray.get_frame_time() * self.speed
         if self.pos.x < 0:
             self.pos.x =0
-        if self.pos.x+self.texture.width*self.scale > WINDOW_WIDTH:
-            self.pos.x = WINDOW_WIDTH - self.texture.width*self.scale
+        if self.pos.x+self.texture.width > WINDOW_WIDTH:
+            self.pos.x = WINDOW_WIDTH - self.texture.width
         if self.pos.y >= self.ground:
             self.pos.y = self.ground
             self.y_vel = 0
@@ -49,7 +53,7 @@ class Character():
 
     def draw(self):
         #draw_texture_v(self.texture, self.pos, WHITE)
-        pyray.draw_texture_ex(self.texture, self.pos, 0, 4, pyray.WHITE)
+        pyray.draw_texture_ex(self.texture, self.pos, 0, 1, pyray.WHITE)
 
 
 class Ball():
