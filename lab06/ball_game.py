@@ -8,12 +8,22 @@ class Character():
         self.pos = pyray.Vector2(WINDOW_WIDTH//2, WINDOW_HEIGHT)
         self.speed = 200 # 200 pixels/sec
 
+        self.y_max = MAX_HEIGHT
+        self.jump_time = JUMP_TIME
+
         self.gravity = 2 * MAX_HEIGHT / (JUMP_TIME**2)
+        self.jump_force = -(2*MAX_HEIGHT/JUMP_TIME)
+
+        self.mouse_pos = pyray.Vector2(0,0)
+
         self.y_vel = 0
         self.grounded = True
         self.ground = 0
 
-        self.jump_force = -(2*MAX_HEIGHT/JUMP_TIME)
+        self.time_toggle = False
+
+        self.mouse_clicked = False
+       
 
     def startup(self):
         # be careful path: how you run?>
@@ -26,6 +36,9 @@ class Character():
         self.pos.y = self.ground
 
     def update(self):
+        self.gravity = 2 * self.y_max/ (self.jump_time**2)
+        self.jump_force = -(2*self.y_max/self.jump_time)
+
         motion = pyray.Vector2(0, 0)
 
         if pyray.is_key_down(pyray.KeyboardKey.KEY_RIGHT):
@@ -34,10 +47,27 @@ class Character():
         if pyray.is_key_down(pyray.KeyboardKey.KEY_LEFT):
             motion.x += -1 
         
+        if pyray.is_key_pressed(pyray.KeyboardKey.KEY_C):
+            self.time_toggle = not self.time_toggle
+
+        if self.time_toggle and pyray.is_key_pressed(pyray.KeyboardKey.KEY_UP):
+            self.jump_time += 0.1
+
+        if self.time_toggle and pyray.is_key_pressed(pyray.KeyboardKey.KEY_DOWN):
+            self.jump_time -= 0.1
+        
         if pyray.is_key_pressed(pyray.KeyboardKey.KEY_SPACE):
             self.y_vel = self.jump_force
             self.grounded = False
-            
+
+        
+        if pyray.is_mouse_button_pressed(0):
+            self.mouse_pos = pyray.get_mouse_position()
+            self.y_max = WINDOW_HEIGHT - self.mouse_pos.y
+            self.mouse_clicked = True
+
+        
+        
         self.y_vel += self.gravity * pyray.get_frame_time()
         self.pos.y += self.y_vel * pyray.get_frame_time()
         self.pos.x += motion.x * pyray.get_frame_time() * self.speed
@@ -119,10 +149,17 @@ class Game:
         
     def draw(self):
         pyray.draw_fps(20, 20)
-
         if (self.visible):
             self.ball.draw()
             self.character.draw()
+
+            if self.character.time_toggle:
+                pyray.draw_text("TIME MODE ACTIVATED", 100,100,50,pyray.GREEN)
+                pyray.draw_text(f"Jump Time: {self.character.jump_time}", 100,150,50,pyray.GREEN)
+
+            if self.character.mouse_clicked:
+                pyray.draw_circle(int(self.character.mouse_pos.x), int(self.character.mouse_pos.y), 5, pyray.BLACK)
+
         else:      
             pyray.draw_text("Invisible!", 200, 200, 40, pyray.WHITE)
 
