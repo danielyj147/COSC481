@@ -7,6 +7,7 @@ class Character():
     def __init__(self):
         self.pos = pyray.Vector2(WINDOW_WIDTH//2, WINDOW_HEIGHT)
         self.speed = 200 # 200 pixels/sec
+        self.x_vel = 0
 
         self.y_max = MAX_HEIGHT
         self.jump_time = JUMP_TIME
@@ -20,14 +21,15 @@ class Character():
         self.grounded = True
         self.ground = 0
 
+        # modes
         self.time_toggle = False
-
+        self.lateral_toggle = False
         self.mouse_clicked = False
        
 
     def startup(self):
         # be careful path: how you run?>
-        THIS_DIR = Path(__file__).resolve().parent
+        THIS_DIR = Path(__file__).resolve().parent 
         TEXTURE_PATH = f"{THIS_DIR}/resources/z.png"
         self.texture = pyray.load_texture(TEXTURE_PATH)
         self.texture.height = 100
@@ -56,7 +58,11 @@ class Character():
         if self.time_toggle and pyray.is_key_pressed(pyray.KeyboardKey.KEY_DOWN):
             self.jump_time -= 0.1
         
-        if pyray.is_key_pressed(pyray.KeyboardKey.KEY_SPACE):
+        if pyray.is_key_pressed(pyray.KeyboardKey.KEY_SPACE) and self.grounded:
+            if self.lateral_toggle:
+                distance  = -(self.pos.x - self.mouse_pos.x)
+                self.x_vel = distance / self.jump_time
+        
             self.y_vel = self.jump_force
             self.grounded = False
 
@@ -66,18 +72,26 @@ class Character():
             self.y_max = WINDOW_HEIGHT - self.mouse_pos.y
             self.mouse_clicked = True
 
-        
+        if pyray.is_key_pressed(pyray.KeyboardKey.KEY_X):
+            self.lateral_toggle = not self.lateral_toggle
+            
+
         
         self.y_vel += self.gravity * pyray.get_frame_time()
         self.pos.y += self.y_vel * pyray.get_frame_time()
+        self.pos.x += self.x_vel * pyray.get_frame_time()
+        
         self.pos.x += motion.x * pyray.get_frame_time() * self.speed
+
         if self.pos.x < 0:
             self.pos.x =0
         if self.pos.x+self.texture.width > WINDOW_WIDTH:
             self.pos.x = WINDOW_WIDTH - self.texture.width
         if self.pos.y >= self.ground:
             self.pos.y = self.ground
+
             self.y_vel = 0
+            self.x_vel = 0
             self.grounded= True
         else:
             self.grounded = False
