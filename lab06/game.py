@@ -111,7 +111,7 @@ class Ball():
         self.y_vel = 0
         self.gravity = 800
         self.elasticity = 0.8
-        self.elasticity_toggle = False
+        self.elasticity_toggle = True
         self.ground = WINDOW_HEIGHT - self.radius
 
     def respawn(self):
@@ -197,8 +197,9 @@ class Game:
                 pyray.draw_circle(int(self.character.mouse_pos.x), int(self.character.mouse_pos.y), 5, pyray.BLACK)
             
             if self.ball.elasticity_toggle:
-                pyray.draw_text("ELASTICITY MODE", 100, 100, 50, pyray.ORANGE)
-                pyray.draw_text(f"Elasticity: {self.ball.elasticity:.2f}", 100, 150, 50, pyray.ORANGE)
+                pyray.draw_text("Press E: Respawn", 100, 100, 50, pyray.ORANGE)
+                pyray.draw_text("UP/DOWN: adjust e", 100, 150, 50, pyray.ORANGE)
+                pyray.draw_text(f"Elasticity: {self.ball.elasticity:.2f}", 100, 200, 50, pyray.ORANGE)
 
 
         else:      
