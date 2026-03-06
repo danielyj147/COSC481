@@ -1,5 +1,5 @@
 import pyray
-from ball_game import *
+from game import *
 from settings import * 
 current_game = Game()
 

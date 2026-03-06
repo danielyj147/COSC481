@@ -22,8 +22,9 @@ class Character():
         self.ground = 0
 
         # modes
-        self.time_toggle = False
-        self.lateral_toggle = False
+        self.time_toggle = False # `c` to activate
+        self.lateral_toggle = False # `x` to activate
+
         self.mouse_clicked = False
        
 
