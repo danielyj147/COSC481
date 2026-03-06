@@ -103,29 +103,48 @@ class Character():
 
 
 class Ball():
-    def __init__(self, radius, position, velocity):
+    SPAWN_POS = pyray.Vector2(100, 100)
+
+    def __init__(self, radius):
         self.radius = radius
-        self.position = position
-        self.velocity = velocity
+        self.position = pyray.Vector2(self.SPAWN_POS.x, self.SPAWN_POS.y)
+        self.y_vel = 0
+        self.gravity = 800
+        self.elasticity = 0.8
+        self.elasticity_toggle = False
+        self.ground = WINDOW_HEIGHT - self.radius
+
+    def respawn(self):
+        self.position.x = self.SPAWN_POS.x
+        self.position.y = self.SPAWN_POS.y
+        self.y_vel = 0
 
     def update(self):
-        self.position.x += self.velocity.x
-        self.position.y += self.velocity.y
+        if pyray.is_key_pressed(pyray.KeyboardKey.KEY_E):
+            self.elasticity_toggle = not self.elasticity_toggle
+            self.respawn()
 
-        # Check walls collision for bouncing
-        if (self.position.x > WINDOW_WIDTH or self.position.x <= 0):
-            self.velocity.x = self.velocity.x * -1.0
+        if self.elasticity_toggle:
+            if pyray.is_key_pressed(pyray.KeyboardKey.KEY_UP):
+                self.elasticity = min(1.0, self.elasticity + 0.05)
+            if pyray.is_key_pressed(pyray.KeyboardKey.KEY_DOWN):
+                self.elasticity = max(0.0, self.elasticity - 0.05)
 
+        dt = pyray.get_frame_time()
+        self.y_vel += self.gravity * dt
+        self.position.y += self.y_vel * dt
 
-        if (self.position.y >=  WINDOW_HEIGHT  or self.position.y <= self.radius):
-            self.velocity.y =  self.velocity.y * - 1.0
+        if self.position.y >= self.ground:
+            self.position.y = self.ground
+            self.y_vel = -self.y_vel * self.elasticity
+
+        if self.position.y <= self.radius:
+            self.position.y = self.radius
+            self.y_vel = -self.y_vel * self.elasticity
 
     def draw(self):
-        #draw_circle_lines_v(self.position, self.radius, BLACK)
-        pyray.draw_circle_v(self.position, self.radius+5, pyray.BLACK)
+        pyray.draw_circle_v(self.position, self.radius + 5, pyray.BLACK)
         pyray.draw_circle_v(self.position, self.radius, pyray.DARKPURPLE)
-
-
 
 
 class Game:
@@ -133,8 +152,7 @@ class Game:
     def __init__(self):
         self.visible = True
         self.moving = True
-        self.ball = Ball(10,pyray.Vector2(100, 100),
-                pyray.Vector2(2.0, 2.5))
+        self.ball = Ball(10)
         self.character = Character()
 
     # where game assets/resources will be initialized
@@ -144,28 +162,31 @@ class Game:
 
 
     def update(self):
-       self.visible = not pyray.is_key_down(pyray.KeyboardKey.KEY_I) # change it to a toogle
-       
-       if pyray.is_key_pressed(pyray.KeyboardKey.KEY_S): # change it to a toogle
+        self.visible = not pyray.is_key_down(pyray.KeyboardKey.KEY_I) # change it to a toogle
+        if pyray.is_key_pressed(pyray.KeyboardKey.KEY_S): # change it to a toogle
            self.moving = not self.moving
            
-    
-       
-       if self.visible and self.moving: 
-           
-           self.ball.update()#, self.screenWidth, 0, self.screenHeight)
-           self.character.update()
-           if (pyray.is_key_down(pyray.KeyboardKey.KEY_RIGHT_BRACKET)):
-               self.character.speed += 20
-           if (pyray.is_key_down(pyray.KeyboardKey.KEY_LEFT_BRACKET)):
-               self.character.speed -= 20
+
+        
+        if self.visible and self.moving: 
+            self.ball.update()#, self.screenWidth, 0, self.screenHeight)
+            self.character.update()
+            if self.ball.elasticity_toggle:
+                self.character.time_toggle = False
+            if self.character.time_toggle:
+                self.ball.elasticity_toggle = False
+            if (pyray.is_key_down(pyray.KeyboardKey.KEY_RIGHT_BRACKET)):
+                self.character.speed += 20
+            if (pyray.is_key_down(pyray.KeyboardKey.KEY_LEFT_BRACKET)):
+                self.character.speed -= 20
 
 
         
     def draw(self):
         pyray.draw_fps(20, 20)
         if (self.visible):
-            self.ball.draw()
+            if self.ball.elasticity_toggle:
+                self.ball.draw()
             self.character.draw()
 
             if self.character.time_toggle:
@@ -174,6 +195,11 @@ class Game:
 
             if self.character.mouse_clicked:
                 pyray.draw_circle(int(self.character.mouse_pos.x), int(self.character.mouse_pos.y), 5, pyray.BLACK)
+            
+            if self.ball.elasticity_toggle:
+                pyray.draw_text("ELASTICITY MODE", 100, 100, 50, pyray.ORANGE)
+                pyray.draw_text(f"Elasticity: {self.ball.elasticity:.2f}", 100, 150, 50, pyray.ORANGE)
+
 
         else:      
             pyray.draw_text("Invisible!", 200, 200, 40, pyray.WHITE)
