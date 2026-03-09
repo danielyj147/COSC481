@@ -1,4 +1,38 @@
-WINDOW_WIDTH = 800
-WINDOW_HEIGHT = 600
+"""Game configuration constants for PANG."""
 
-METEOR_COUNT = 2
+# Window
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 450
+FPS = 60
+
+# Player
+PLAYER_SPEED = 5.0
+PLAYER_MAX_SHOOTS = 1
+
+# Balls
+MAX_BIG_BALLS = 2
+BALLS_SPEED = 2.0
+GRAVITY = 0.25
+
+# Ball radii
+BIG_BALL_RADIUS = 40.0
+MEDIUM_BALL_RADIUS = 20.0
+SMALL_BALL_RADIUS = 10.0
+
+# Ball point values
+BIG_BALL_POINTS = 200
+MEDIUM_BALL_POINTS = 100
+SMALL_BALL_POINTS = 50
+
+# Fixed upward velocity on floor bounce (ensures consistent bounce height)
+BIG_BALL_BOUNCE_SPEED = -8.0
+MEDIUM_BALL_BOUNCE_SPEED = -6.5
+SMALL_BALL_BOUNCE_SPEED = -5.0
+
+# Shoot
+SHOOT_LIFETIME = 120  # frames
+
+# Floating points
+MAX_FLOATING_POINTS = 5
+POINTS_FADE_SPEED = 0.02
+POINTS_RISE_SPEED = 2.0

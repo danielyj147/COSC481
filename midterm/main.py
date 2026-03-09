@@ -1,31 +1,28 @@
-"""
-PANG
+"""PANG - Classic arcade game reimplemented in Python with Pyray.
+
 Author: Daniel Jeong
 """
+
 from game import Game
-from pyray import * # pyright: ignore[reportWildcardImportFromLibrary]
-from settings import * 
+from pyray import *  # pyright: ignore[reportWildcardImportFromLibrary]
+from settings import WINDOW_WIDTH, WINDOW_HEIGHT, FPS
 
 game = Game()
 
-if __name__ == '__main__':  
+if __name__ == "__main__":
+    init_window(WINDOW_WIDTH, WINDOW_HEIGHT, "PANG")
+    set_target_fps(FPS)
 
-  init_window(WINDOW_WIDTH, WINDOW_HEIGHT, "Python Game")
-  set_target_fps(60)
+    game.load_textures()
+    game.startup()
 
-  game.startup()
-  
-  while not window_should_close():
+    while not window_should_close():
+        game.update()
 
-    game.update()
-    
-    begin_drawing()
-    clear_background(WHITE)
+        begin_drawing()
+        clear_background(RAYWHITE)
+        game.draw()
+        end_drawing()
 
-    game.draw()
-
-    end_drawing()
-
-close_window()
-  
-game.shutdown()
+    game.shutdown()
+    close_window()
