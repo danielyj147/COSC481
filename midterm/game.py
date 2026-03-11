@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import random
 from enum import Enum
+import logging
 
 # "Cheating" ==> otherwise code gets bloated
 from pyray import *  # pyright: ignore[reportWildcardImportFromLibrary]
@@ -18,6 +19,13 @@ class BallSize(Enum):
     BIG = "big"
     MEDIUM = "medium"
     SMALL = "small"
+
+
+class MusicType(Enum):
+    SHOOT = "shoot"
+    LOSE = "lose"
+    WIN = "win"
+    BACKGROUND = "background"
 
 
 # Properties per size: (radius, points, bounce_speed)
@@ -44,7 +52,16 @@ BALL_SPRITES: dict[BallSize, str] = {
     BallSize.SMALL: os.path.join(ASSET_DIR, "ball_small.png"),
 }
 
+# Music paths
+MUSICS: dict[MusicType, str] = {
+    # MusicType.SHOOT: os.path.join(ASSET_DIR, "ball_big.png"),
+    # MusicType.WIN: os.path.join(ASSET_DIR, "ball_medium.png"),
+    # MusicType.LOSE: os.path.join(ASSET_DIR, "ball_small.png"),
+    MusicType.BACKGROUND: os.path.join(ASSET_DIR, "background.mp3"),
+}
+
 ball_textures: dict[BallSize, Texture] = {}
+game_musics: dict[MusicType, Music] = {}
 
 
 class Player:
@@ -286,6 +303,12 @@ class Game:
 
         self.player.setup()
 
+        self.music = None
+
+        # Background music
+        self.music = game_musics[MusicType.BACKGROUND]
+        play_music_stream(self.music)
+
         for s in self.shoots:
             s.setup()
 
@@ -324,6 +347,9 @@ class Game:
         # No need to update anything if paused!
         if self.paused:
             return
+
+        if self.music:
+            update_music_stream(self.music)
 
         self.player.update()
 
@@ -384,7 +410,7 @@ class Game:
                     children = ball.split()
                     self.balls.extend(children)
                     break  # One shoot can only hit one ball
-    
+
     def _spawn_floating_points(self, position: Vector2, value: int) -> None:
         for fp in self.floating_points:
             if fp.alpha <= 0.0:
@@ -448,8 +474,14 @@ class Game:
         for size, path in BALL_SPRITES.items():
             ball_textures[size] = load_texture(path)
 
+    def load_music(self) -> None:
+        for music, path in MUSICS.items():
+            game_musics[music] = load_music_stream(path)
+
     def shutdown(self) -> None:
         self.player.unload_texture()
         for texture in ball_textures.values():
             unload_texture(texture)
+        for music in game_musics.values():
+            unload_music_stream(music)
         ball_textures.clear()
