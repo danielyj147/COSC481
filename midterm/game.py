@@ -54,9 +54,9 @@ BALL_SPRITES: dict[BallSize, str] = {
 
 # Music paths
 MUSICS: dict[MusicType, str] = {
-    # MusicType.SHOOT: os.path.join(ASSET_DIR, "ball_big.png"),
-    # MusicType.WIN: os.path.join(ASSET_DIR, "ball_medium.png"),
-    # MusicType.LOSE: os.path.join(ASSET_DIR, "ball_small.png"),
+    # MusicType.SHOOT: os.path.join(ASSET_DIR, "shoot.mp3"),
+    # MusicType.WIN: os.path.join(ASSET_DIR, "win.mp3"),
+    # MusicType.LOSE: os.path.join(ASSET_DIR, "lose.wave"),
     MusicType.BACKGROUND: os.path.join(ASSET_DIR, "background.mp3"),
 }
 
@@ -480,8 +480,11 @@ class Game:
 
     def shutdown(self) -> None:
         self.player.unload_texture()
+
         for texture in ball_textures.values():
             unload_texture(texture)
+
         for music in game_musics.values():
             unload_music_stream(music)
+
         ball_textures.clear()

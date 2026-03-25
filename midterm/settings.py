@@ -31,6 +31,7 @@ SMALL_BALL_BOUNCE_SPEED = -5.0
 
 # Shoot
 SHOOT_LIFETIME = 120  # frames
+SHOOT_SPEED = 5.0
 
 # Floating points
 MAX_FLOATING_POINTS = 5
