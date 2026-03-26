@@ -1,4 +1,4 @@
-from pyray import *
+from pyray import * # type: ignore
 from settings import *
 
 from enum import IntEnum
@@ -86,12 +86,12 @@ def test():
         row=9, sprites_in_row=4,)
 
     while not window_should_close():
-        if is_key_pressed(KEY_SPACE): # stop the animation
+        if is_key_pressed(KeyboardKey.KEY_SPACE): # stop the animation
             anim.cur = anim.first
 
-        if is_key_pressed(KEY_A):     
+        if is_key_pressed(KeyboardKey.KEY_A):
             player_direction = Direction.LEFT
-        elif is_key_pressed(KEY_D):
+        elif is_key_pressed(KeyboardKey.KEY_D):
             player_direction = Direction.RIGHT
 
         anim.update(get_frame_time())
@@ -121,6 +121,6 @@ def test():
 
     unload_texture(player_idle_texture)
     close_window()
-      
+
 if __name__ == "__main__":
     test()

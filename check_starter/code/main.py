@@ -1,9 +1,9 @@
-from pyray import *
+from pyray import *  # type: ignore
 from game import *
 from settings import *
 
 current_game = Game()
- 
+
 if __name__ == "__main__":
 
     init_window(WINDOW_WIDTH, WINDOW_HEIGHT, "Sprite sheet demo")
