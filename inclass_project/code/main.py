@@ -15,11 +15,12 @@ if __name__ == "__main__":
         current_game.update()
 
         begin_drawing()
-        clear_background(PINK)
-
+        clear_background(RAYWHITE)
+        begin_mode_2d(current_game.camera)
 
         current_game.draw()
 
+        end_mode_2d()
         end_drawing()
 
     close_window()
