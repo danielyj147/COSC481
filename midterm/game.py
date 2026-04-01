@@ -20,11 +20,17 @@ class BallSize(Enum):
     MEDIUM = "medium"
     SMALL = "small"
 
+
 class MusicType(Enum):
+    BACKGROUND = "background"
+    TITLE = "title"
+
+
+class SoundType(Enum):
     SHOOT = "shoot"
     LOSE = "lose"
     WIN = "win"
-    BACKGROUND = "background"
+    SPLIT = "split"
 
 
 # Properties per size: (radius, points, bounce_speed)
@@ -53,14 +59,19 @@ BALL_SPRITES: dict[BallSize, str] = {
 
 # Music paths
 MUSICS: dict[MusicType, str] = {
-    # MusicType.SHOOT: os.path.join(ASSET_DIR, "shoot.mp3"),
-    # MusicType.WIN: os.path.join(ASSET_DIR, "win.mp3"),
-    # MusicType.LOSE: os.path.join(ASSET_DIR, "lose.wave"),
     MusicType.BACKGROUND: os.path.join(ASSET_DIR, "background.mp3"),
+}
+
+SOUNDS: dict[SoundType, str] = {
+    SoundType.LOSE: os.path.join(ASSET_DIR, "lose.wav"),
+    SoundType.SHOOT: os.path.join(ASSET_DIR, "shoot.mp3"),
+    SoundType.WIN: os.path.join(ASSET_DIR, "win.mp3"),
+    SoundType.SPLIT: os.path.join(ASSET_DIR, "split.mp3"),
 }
 
 ball_textures: dict[BallSize, Texture] = {}
 game_musics: dict[MusicType, Music] = {}
+game_sounds: dict[SoundType, Sound] = {}
 
 
 class Player:
@@ -135,6 +146,7 @@ class Shoot:
         self.speed = PLAYER_SPEED
         self.active = True
         self.life_frames = 0
+        play_sound(game_sounds[SoundType.SHOOT])
 
     def update(self) -> None:
         if not self.active:
@@ -226,7 +238,7 @@ class Ball:
         child_size = BALL_SPLIT[self.size]
         if child_size is None:
             return []
-
+        play_sound(game_sounds[SoundType.SPLIT])
         return [
             Ball(
                 child_size,
@@ -301,6 +313,9 @@ class Game:
             FloatingPoints() for _ in range(MAX_FLOATING_POINTS)
         ]
 
+        self.background_music: Music
+        self.sound: dict[SoundType, Sound]
+
     def startup(self) -> None:
         self.score = 0
         self.game_over = False
@@ -310,8 +325,8 @@ class Game:
         self.player.setup()
 
         # Background music
-        self.music = game_musics[MusicType.BACKGROUND]
-        play_music_stream(self.music)
+        self.background_music = game_musics[MusicType.BACKGROUND]
+        play_music_stream(self.background_music)
 
         for s in self.shoots:
             s.setup()
@@ -352,8 +367,8 @@ class Game:
         if self.paused:
             return
 
-        if self.music:
-            update_music_stream(self.music)
+        if self.background_music:
+            update_music_stream(self.background_music)
 
         self.player.update()
 
@@ -378,6 +393,8 @@ class Game:
                 ball.radius,
             ):
                 self.game_over = True
+                play_sound(game_sounds[SoundType.LOSE])
+
                 return
 
         # Check shoot-ball collisions
@@ -464,10 +481,10 @@ class Game:
                     LIGHTGRAY,
                 )
 
-        else: # Gameover / Title
+        else:  # Gameover
             draw_rectangle_gradient_ex(
                 self.title,
-                DARKBLUE,
+                MAROON,
                 RAYWHITE,
                 MAROON,
                 RAYWHITE,
@@ -490,6 +507,8 @@ class Game:
     def load_music(self) -> None:
         for music, path in MUSICS.items():
             game_musics[music] = load_music_stream(path)
+        for sound, path in SOUNDS.items():
+            game_sounds[sound] = load_sound(path)
 
     def shutdown(self) -> None:
         self.player.unload_texture()
@@ -499,5 +518,8 @@ class Game:
 
         for music in game_musics.values():
             unload_music_stream(music)
+
+        for sound in game_sounds.values():
+            unload_sound(sound)
 
         ball_textures.clear()

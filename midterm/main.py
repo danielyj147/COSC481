@@ -18,8 +18,6 @@ if __name__ == "__main__":
     game.load_music()
     game.startup()
 
-
-
     while not window_should_close():
         game.update()
 
@@ -29,4 +27,5 @@ if __name__ == "__main__":
         end_drawing()
 
     game.shutdown()
+    close_audio_device()
     close_window()
