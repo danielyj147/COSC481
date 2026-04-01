@@ -8,8 +8,11 @@ from Player import *
 TEXTURES_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "hero-sheet.png"
 )
+BACKGROUND_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources")
 
 MAX_BUILDINGS = 100
+
+
 
 
 class Game:
@@ -25,6 +28,9 @@ class Game:
         self.spacing = 0
         self.buildings = []
         self.build_colors = []
+
+        self.background_textures = []
+        self.background = None
 
     def startup(self):
         self.player.load_texture(TEXTURES_PATH)
@@ -51,7 +57,9 @@ class Game:
                     255,
                 )
             )
-
+        for dirpath, dirnames, filenames in os.walk(BACKGROUND_PATH):
+            self.background_textures.extend(filenames)
+        
     def update(self):
         dt = get_frame_time()
         self.player.update(dt)
@@ -89,6 +97,7 @@ class Game:
 
     def draw(self):
         draw_fps(20, 20)
+        # draw_texture_pro() # missing background textures
         for i in range(MAX_BUILDINGS):
             draw_rectangle_rec(self.buildings[i], self.build_colors[i])
         draw_rectangle_rec(self.ground, YELLOW)
