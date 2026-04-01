@@ -20,7 +20,6 @@ class BallSize(Enum):
     MEDIUM = "medium"
     SMALL = "small"
 
-
 class MusicType(Enum):
     SHOOT = "shoot"
     LOSE = "lose"
@@ -285,12 +284,19 @@ class FloatingPoints:
 class Game:
     def __init__(self) -> None:
         self.score: int = 0
+
+        # Game States
         self.game_over: bool = False
         self.victory: bool = False
         self.paused: bool = False
+        self.title: Rectangle = Rectangle(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
+
         self.player: Player = Player()
+
         self.shoots: list[Shoot] = [Shoot() for _ in range(PLAYER_MAX_SHOOTS)]
+
         self.balls: list[Ball] = []
+
         self.floating_points: list[FloatingPoints] = [
             FloatingPoints() for _ in range(MAX_FLOATING_POINTS)
         ]
@@ -302,8 +308,6 @@ class Game:
         self.paused = False
 
         self.player.setup()
-
-        self.music = None
 
         # Background music
         self.music = game_musics[MusicType.BACKGROUND]
@@ -459,8 +463,17 @@ class Game:
                     40,
                     LIGHTGRAY,
                 )
-        else:
-            msg = "PRESS [ENTER] TO PLAY AGAIN"
+
+        else: # Gameover / Title
+            draw_rectangle_gradient_ex(
+                self.title,
+                DARKBLUE,
+                RAYWHITE,
+                MAROON,
+                RAYWHITE,
+            )
+
+            msg = "PRESS [ENTER] TO PLAY"
             draw_text(
                 msg,
                 WINDOW_WIDTH // 2 - measure_text(msg, 20) // 2,
