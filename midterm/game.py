@@ -179,15 +179,15 @@ class Shoot:
     """A beam that travels from the player upward (or at an angle for side shoots)."""
 
     def __init__(self, angle_deg: float = 0.0) -> None:
-        self.tip: Vector2 = Vector2(0, 0)       # moving end of the beam
-        self.origin: Vector2 = Vector2(0, 0)     # stays at the player's position
+        self.tip: Vector2 = Vector2(0, 0)  # moving end of the beam
+        self.origin: Vector2 = Vector2(0, 0)  # stays at the player's position
         self.speed: float = 0.0
         self.life_frames: int = 0
         self.active: bool = False
-        self.width: float = SHOOT_BASE_WIDTH     # wider = charged shot
-        self.angle_deg: float = angle_deg        # 0 = straight up, +/- for side shoots
-        self.dx: float = 0.0                     # per-frame x movement (from angle)
-        self.dy: float = 0.0                     # per-frame y movement (from angle)
+        self.width: float = SHOOT_BASE_WIDTH  # wider = charged shot
+        self.angle_deg: float = angle_deg  # 0 = straight up, +/- for side shoots
+        self.dx: float = 0.0  # per-frame x movement (from angle)
+        self.dy: float = 0.0  # per-frame y movement (from angle)
 
     def setup(self) -> None:
         self.active = False
@@ -203,6 +203,7 @@ class Shoot:
         self.width = width
         # Convert angle to per-frame velocity components
         # sin for horizontal spread, -cos so 0 degrees = straight up
+        # Regret adding this feature... took some time to debug & visualize
         angle_rad = math.radians(self.angle_deg)
         self.dx = math.sin(angle_rad) * self.speed
         self.dy = -math.cos(angle_rad) * self.speed
