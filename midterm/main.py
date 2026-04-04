@@ -22,7 +22,7 @@ if __name__ == "__main__":
         game.update()
 
         begin_drawing()
-        clear_background(RAYWHITE)
+        clear_background(Color(10, 10, 30, 255))
         game.draw()
         end_drawing()
 

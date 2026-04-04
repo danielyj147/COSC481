@@ -1,5 +1,6 @@
 # idk why but using Ball as a class requires this.
 from __future__ import annotations
+import math
 import os
 import random
 from enum import Enum
@@ -167,13 +168,16 @@ class Player:
 
 
 class Shoot:
-    def __init__(self) -> None:
+    def __init__(self, angle_deg: float = 0.0) -> None:
         self.tip: Vector2 = Vector2(0, 0)
         self.origin: Vector2 = Vector2(0, 0)
         self.speed: float = 0.0
         self.life_frames: int = 0
         self.active: bool = False
         self.width: float = SHOOT_BASE_WIDTH
+        self.angle_deg: float = angle_deg
+        self.dx: float = 0.0
+        self.dy: float = 0.0
 
     def setup(self) -> None:
         self.active = False
@@ -187,26 +191,33 @@ class Shoot:
         self.active = True
         self.life_frames = 0
         self.width = width
+        angle_rad = math.radians(self.angle_deg)
+        self.dx = math.sin(angle_rad) * self.speed
+        self.dy = -math.cos(angle_rad) * self.speed
         play_sound(game_sounds[SoundType.SHOOT])
 
     def update(self) -> None:
         if not self.active:
             return
 
-        self.tip.y -= self.speed
+        self.tip.x += self.dx
+        self.tip.y += self.dy
         self.life_frames += 1
 
-        if self.tip.y < 0 or self.life_frames >= SHOOT_LIFETIME:
+        if (
+            self.tip.y < 0
+            or self.tip.x < 0
+            or self.tip.x > WINDOW_WIDTH
+            or self.life_frames >= SHOOT_LIFETIME
+        ):
             self.active = False
 
     def draw(self) -> None:
         if self.active:
-            half_w = self.width / 2
-            draw_rectangle(
-                int(self.origin.x - half_w),
-                int(self.tip.y),
-                int(self.width),
-                int(self.origin.y - self.tip.y),
+            draw_line_ex(
+                self.origin,
+                self.tip,
+                self.width,
                 RED,
             )
 
@@ -381,6 +392,7 @@ class Game:
 
         self.background_music: Music
         self.sound: dict[SoundType, Sound]
+        self.bg_texture: Texture | None = None
 
     def startup(self) -> None:
         self.score = 0
@@ -478,7 +490,12 @@ class Game:
             ):
                 pu.active = False
                 self.max_shoots += 1
-                self.shoots.append(Shoot())
+                side_count = self.max_shoots - 1
+                if side_count % 2 == 1:
+                    angle = -SHOOT_ANGLE_DEG * ((side_count + 1) // 2)
+                else:
+                    angle = SHOOT_ANGLE_DEG * (side_count // 2)
+                self.shoots.append(Shoot(angle_deg=angle))
                 play_sound(game_sounds[SoundType.PICKUP])
 
         # Check player-ball collisions
@@ -512,13 +529,16 @@ class Game:
                 if not ball.active:
                     continue
 
-                half_w = shoot.width / 2
-                shoot_left = shoot.origin.x - half_w
-                shoot_right = shoot.origin.x + half_w
-                if (
-                    shoot_right >= ball.position.x - ball.radius
-                    and shoot_left <= ball.position.x + ball.radius
-                    and ball.position.y + ball.radius >= shoot.tip.y
+                hit_radius = ball.radius + shoot.width / 2
+                if check_collision_circle_rec(
+                    ball.position,
+                    hit_radius,
+                    Rectangle(
+                        min(shoot.origin.x, shoot.tip.x) - shoot.width / 2,
+                        min(shoot.origin.y, shoot.tip.y),
+                        abs(shoot.tip.x - shoot.origin.x) + shoot.width,
+                        abs(shoot.origin.y - shoot.tip.y),
+                    ),
                 ):
                     shoot.active = False
                     ball.active = False
@@ -540,7 +560,18 @@ class Game:
                 fp.activate(position, value)
                 return
 
+    def _draw_background(self) -> None:
+        if self.bg_texture is None:
+            return
+        tw = self.bg_texture.width
+        th = self.bg_texture.height
+        for x in range(0, WINDOW_WIDTH, tw):
+            for y in range(0, WINDOW_HEIGHT, th):
+                draw_texture(self.bg_texture, x, y, WHITE)
+
     def draw(self) -> None:
+        self._draw_background()
+
         if not self.game_over:
             for s in self.shoots:
                 s.draw()
@@ -595,14 +626,14 @@ class Game:
                 )
 
         else:  # Gameover
-            draw_rectangle_gradient_ex(
-                self.title,
+            title = "GAME OVER"
+            draw_text(
+                title,
+                WINDOW_WIDTH // 2 - measure_text(title, 60) // 2,
+                100,
+                60,
                 MAROON,
-                RAYWHITE,
-                MAROON,
-                RAYWHITE,
             )
-
             msg = "PRESS [ENTER] TO PLAY"
             draw_text(
                 msg,
@@ -616,6 +647,7 @@ class Game:
         self.player.load_texture()
         for size, path in BALL_SPRITES.items():
             ball_textures[size] = load_texture(path)
+        self.bg_texture = load_texture(os.path.join(ASSET_DIR, "star_bg.png"))
 
     def load_music(self) -> None:
         for music, path in MUSICS.items():
@@ -625,6 +657,9 @@ class Game:
 
     def shutdown(self) -> None:
         self.player.unload_texture()
+
+        if self.bg_texture is not None:
+            unload_texture(self.bg_texture)
 
         for texture in ball_textures.values():
             unload_texture(texture)

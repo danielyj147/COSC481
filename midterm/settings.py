@@ -8,7 +8,7 @@ FPS = 60
 # Player
 PLAYER_SPEED = 5.0
 PLAYER_MAX_SHOOTS = 1
-PLAYER_DRAW_HEIGHT = 50.0
+PLAYER_DRAW_HEIGHT = 40.0
 PLAYER_SHOOT_ANIM_FRAMES = 15
 
 # Balls
@@ -29,7 +29,7 @@ SMALL_BALL_POINTS = 50
 # Fixed upward velocity on floor bounce (ensures consistent bounce height)
 BIG_BALL_BOUNCE_SPEED = -8.0
 MEDIUM_BALL_BOUNCE_SPEED = -6.5
-SMALL_BALL_BOUNCE_SPEED = -5.0
+SMALL_BALL_BOUNCE_SPEED = -7.0
 
 # Shoot
 SHOOT_LIFETIME = 120  # frames
@@ -38,10 +38,11 @@ SHOOT_BASE_WIDTH = 2.0
 SHOOT_MAX_WIDTH = 20.0
 CHARGE_RATE = 0.3  # width increase per frame while holding space
 CHARGE_MAX = 60  # max charge frames
+SHOOT_ANGLE_DEG = 30.0  # angle offset for side shoots
 
 # Powerups
 POWERUP_DROP_CHANCE = 0.4
-POWERUP_FALL_SPEED = 2.0
+POWERUP_FALL_SPEED = 0.8
 POWERUP_RADIUS = 10.0
 MAX_POWERUPS = 10
 
