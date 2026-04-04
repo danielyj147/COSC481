@@ -72,6 +72,14 @@ SOUNDS: dict[SoundType, str] = {
     SoundType.PICKUP: os.path.join(ASSET_DIR, "pickup.wav"),
 }
 
+class GameScreen(Enum):
+    TITLE = "title"
+    INSTRUCTIONS = "instructions"
+    PLAYING = "playing"
+    GAME_OVER = "game_over"
+    VICTORY = "victory"
+
+
 class PlayerState(Enum):
     IDLE = 0
     MOVING_LEFT = 1
@@ -370,10 +378,8 @@ class Game:
         self.score: int = 0
 
         # Game States
-        self.game_over: bool = False
-        self.victory: bool = False
+        self.screen: GameScreen = GameScreen.TITLE
         self.paused: bool = False
-        self.title: Rectangle = Rectangle(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
 
         self.player: Player = Player()
 
@@ -393,11 +399,11 @@ class Game:
         self.background_music: Music
         self.sound: dict[SoundType, Sound]
         self.bg_texture: Texture | None = None
+        self.debug: bool = False
 
     def startup(self) -> None:
         self.score = 0
-        self.game_over = False
-        self.victory = False
+        self.screen = GameScreen.PLAYING
         self.paused = False
         self.charge_frames = 0
         self.charging = False
@@ -435,17 +441,30 @@ class Game:
             fp.alpha = 0.0
 
     def update(self) -> None:
-        # Updating fp before antyhing b/c there was a bug where fp gets "stuck" on gameover screen.
-        for fp in self.floating_points:
-            fp.update()
+        if self.screen == GameScreen.TITLE:
+            if is_key_pressed(KeyboardKey.KEY_ENTER):
+                self.screen = GameScreen.INSTRUCTIONS
+            return
 
-        if self.game_over or self.victory:
+        if self.screen == GameScreen.INSTRUCTIONS:
             if is_key_pressed(KeyboardKey.KEY_ENTER):
                 self.startup()
             return
 
+        # Updating fp before anything b/c there was a bug where fp gets "stuck" on gameover screen.
+        for fp in self.floating_points:
+            fp.update()
+
+        if self.screen in (GameScreen.GAME_OVER, GameScreen.VICTORY):
+            if is_key_pressed(KeyboardKey.KEY_ENTER):
+                self.screen = GameScreen.TITLE
+            return
+
         if is_key_pressed(KeyboardKey.KEY_P):
             self.paused = not self.paused
+
+        if is_key_pressed(KeyboardKey.KEY_D):
+            self.debug = not self.debug
 
         # No need to update anything if paused!
         if self.paused:
@@ -505,7 +524,7 @@ class Game:
                 ball.position,
                 ball.radius,
             ):
-                self.game_over = True
+                self.screen = GameScreen.GAME_OVER
                 play_sound(game_sounds[SoundType.LOSE])
 
                 return
@@ -515,7 +534,7 @@ class Game:
 
         # Check victory: all balls inactive
         if all(not ball.active for ball in self.balls) and len(self.balls) > 0:
-            self.victory = True
+            self.screen = GameScreen.VICTORY
             play_sound(game_sounds[SoundType.WIN])
 
     # "Private" helper func
@@ -568,10 +587,41 @@ class Game:
             for y in range(0, WINDOW_HEIGHT, th):
                 draw_texture(self.bg_texture, x, y, WHITE)
 
+    def _draw_centered(self, text: str, y: int, size: int, color: Color) -> None:
+        draw_text(text, WINDOW_WIDTH // 2 - measure_text(text, size) // 2, y, size, color)
+
     def draw(self) -> None:
         self._draw_background()
 
-        if not self.game_over:
+        if self.screen == GameScreen.TITLE:
+            self._draw_centered("SPACE PANG", 80, 60, WHITE)
+            self._draw_centered("Destroy all meteors to survive!", 160, 20, LIGHTGRAY)
+            self._draw_centered("PRESS [ENTER] TO CONTINUE", WINDOW_HEIGHT // 2 + 40, 20, LIGHTGRAY)
+            return
+
+        if self.screen == GameScreen.INSTRUCTIONS:
+            self._draw_centered("HOW TO PLAY", 30, 40, WHITE)
+            instructions = [
+                ("[LEFT / RIGHT]  Move spaceship", LIGHTGRAY),
+                ("[SPACE tap]  Fire beam", LIGHTGRAY),
+                ("[SPACE hold]  Charge wider beam - release to fire", LIGHTGRAY),
+                ("[P]  Pause / unpause", LIGHTGRAY),
+                ("", LIGHTGRAY),
+                ("Shoot meteors to split them into smaller pieces.", WHITE),
+                ("Destroy all fragments to win.", WHITE),
+                ("If a meteor touches your ship, it's game over.", MAROON),
+                ("", LIGHTGRAY),
+                ("Pick up orange [S] powerups for extra side-angle shots!", ORANGE),
+            ]
+            y = 90
+            for line, color in instructions:
+                if line:
+                    draw_text(line, 60, y, 18, color)
+                y += 28
+            self._draw_centered("PRESS [ENTER] TO START", WINDOW_HEIGHT - 50, 20, LIGHTGRAY)
+            return
+
+        if self.screen == GameScreen.PLAYING:
             for s in self.shoots:
                 s.draw()
 
@@ -596,51 +646,93 @@ class Game:
                 draw_rectangle(bar_x, bar_y, 50, 6, DARKGRAY)
                 draw_rectangle(bar_x, bar_y, bar_width, 6, RED)
 
-            if self.victory:
-                title = "YOU WIN!"
-                draw_text(
-                    title,
-                    WINDOW_WIDTH // 2 - measure_text(title, 60) // 2,
-                    100,
-                    60,
-                    LIGHTGRAY,
-                )
-                msg = "PRESS [ENTER] TO PLAY AGAIN"
-                draw_text(
-                    msg,
-                    WINDOW_WIDTH // 2 - measure_text(msg, 20) // 2,
-                    WINDOW_HEIGHT // 2 - 50,
-                    20,
-                    LIGHTGRAY,
-                )
-
             if self.paused:
-                msg = "GAME PAUSED"
-                draw_text(
-                    msg,
-                    WINDOW_WIDTH // 2 - measure_text(msg, 40) // 2,
-                    WINDOW_HEIGHT // 2 - 40,
-                    40,
-                    LIGHTGRAY,
-                )
+                draw_rectangle(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, fade(BLACK, 0.7))
+                self._draw_centered("PAUSED", 30, 40, WHITE)
+                instructions = [
+                    ("[LEFT / RIGHT]  Move spaceship", LIGHTGRAY),
+                    ("[SPACE tap]  Fire beam", LIGHTGRAY),
+                    ("[SPACE hold]  Charge wider beam - release to fire", LIGHTGRAY),
+                    ("[P]  Unpause    [D]  Toggle debug", LIGHTGRAY),
+                    ("", LIGHTGRAY),
+                    ("Shoot meteors to split them into smaller pieces.", WHITE),
+                    ("Destroy all fragments to win.", WHITE),
+                    ("If a meteor touches your ship, it's game over.", MAROON),
+                    ("", LIGHTGRAY),
+                    ("Pick up orange [S] powerups for extra side-angle shots!", ORANGE),
+                ]
+                y = 90
+                for line, color in instructions:
+                    if line:
+                        draw_text(line, 60, y, 18, color)
+                    y += 28
+                self._draw_centered("PRESS [P] TO RESUME", WINDOW_HEIGHT - 50, 20, LIGHTGRAY)
 
-        else:  # Gameover
-            title = "GAME OVER"
-            draw_text(
-                title,
-                WINDOW_WIDTH // 2 - measure_text(title, 60) // 2,
-                100,
-                60,
-                MAROON,
+            if self.debug:
+                self._draw_debug()
+            return
+
+        if self.screen == GameScreen.VICTORY:
+            self._draw_centered("YOU WIN!", 100, 60, GREEN)
+            self._draw_centered(f"FINAL SCORE: {self.score}", 180, 30, WHITE)
+            self._draw_centered("PRESS [ENTER] FOR TITLE", WINDOW_HEIGHT // 2 + 40, 20, LIGHTGRAY)
+            return
+
+        if self.screen == GameScreen.GAME_OVER:
+            self._draw_centered("GAME OVER", 100, 60, MAROON)
+            self._draw_centered(f"SCORE: {self.score}", 180, 30, WHITE)
+            self._draw_centered("PRESS [ENTER] FOR TITLE", WINDOW_HEIGHT // 2 + 40, 20, LIGHTGRAY)
+
+    def _draw_debug(self) -> None:
+        # Player hitbox
+        draw_circle_lines_v(
+            self.player.collider_center, self.player.collider_radius, GREEN
+        )
+
+        # Ball hitboxes and velocity vectors
+        for ball in self.balls:
+            if not ball.active:
+                continue
+            draw_circle_lines_v(ball.position, ball.radius, YELLOW)
+            draw_line_v(
+                ball.position,
+                Vector2(
+                    ball.position.x + ball.speed.x * 10,
+                    ball.position.y + ball.speed.y * 10,
+                ),
+                YELLOW,
             )
-            msg = "PRESS [ENTER] TO PLAY"
-            draw_text(
-                msg,
-                WINDOW_WIDTH // 2 - measure_text(msg, 20) // 2,
-                WINDOW_HEIGHT // 2 - 50,
-                20,
-                LIGHTGRAY,
-            )
+
+        # Shoot collision boxes
+        for s in self.shoots:
+            if not s.active:
+                continue
+            x1 = min(s.origin.x, s.tip.x) - s.width / 2
+            y1 = min(s.origin.y, s.tip.y)
+            w = abs(s.tip.x - s.origin.x) + s.width
+            h = abs(s.origin.y - s.tip.y)
+            draw_rectangle_lines(int(x1), int(y1), int(w), int(h), GREEN)
+
+        # Powerup hitboxes
+        for pu in self.powerups:
+            if pu.active:
+                draw_circle_lines_v(pu.position, POWERUP_RADIUS, ORANGE)
+
+        # Stats overlay
+        active_balls = sum(1 for b in self.balls if b.active)
+        active_shoots = sum(1 for s in self.shoots if s.active)
+        active_powerups = sum(1 for p in self.powerups if p.active)
+        stats = [
+            f"FPS: {get_fps()}",
+            f"Balls: {active_balls}/{len(self.balls)}",
+            f"Shoots: {active_shoots}/{len(self.shoots)} (max {self.max_shoots})",
+            f"Powerups: {active_powerups}",
+            f"Player: ({self.player.position.x:.0f}, {self.player.position.y:.0f})",
+            f"State: {self.player.state.name}",
+            f"Charge: {self.charge_frames}/{CHARGE_MAX}",
+        ]
+        for i, line in enumerate(stats):
+            draw_text(line, WINDOW_WIDTH - 220, 10 + i * 18, 14, GREEN)
 
     def load_textures(self) -> None:
         self.player.load_texture()

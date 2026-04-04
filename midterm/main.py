@@ -16,7 +16,6 @@ if __name__ == "__main__":
 
     game.load_textures()
     game.load_music()
-    game.startup()
 
     while not window_should_close():
         game.update()
