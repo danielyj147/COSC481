@@ -4,9 +4,9 @@ A space-themed reimplementation of the classic PANG (Buster Bros) arcade game, b
 
 ## Game Description
 
-The player controls a spaceship at the bottom of the screen, firing beams upward to destroy bouncing meteors. When a meteor is hit, it splits into two smaller, faster fragments. The goal is to destroy all fragments without getting hit.
+The player controls a spaceship at the bottom of the screen, firing beams upward to destroy bouncing meteors. When a meteor is hit, it splits into two smaller, faster meteors. The goal is to destroy all meteors without getting hit.
 
-Charging a beam makes it wider but diverts energy from the ship, leaving it visually damaged and vulnerable. Powerups dropped from destroyed meteors grant additional angled beams that fire simultaneously.
+Charging a beam makes it wider but also makes the ship visually damaged(no actually penalties, but makes it visually more dynamic). Powerups dropped from destroyed meteors grant additional angled beams that fire simultaneously.
 
 Based on the [C/Raylib PANG](https://github.com/raysan5/raylib-games/blob/master/classics/src/pang.c) by Ramon Santamaria.
 
@@ -14,19 +14,21 @@ Based on the [C/Raylib PANG](https://github.com/raysan5/raylib-games/blob/master
 
 ### Charged Shoot
 
-Holding Space charges a wider beam. The ship switches to its damaged sprite during charge to communicate the energy drain. Releasing fires all available beams at once. Quick taps fire a thin beam with no penalty.
+Holding Space charges a wider beam. The ship switches to its damaged sprite during charge to communicate the energy drain.
+There are no actual penalties, but changing its appearance makes the game visually more interesting. 
+Releasing the spacebar fires all available beams at once. Quickly pressing and releasing the spacebar fires a thin beam.
 
 ![shoot](screenshots/final_shoot.png)
 
 ### Meteor Split
 
-Big meteors split into two medium, medium into two small, and small ones pop. Each size has different bounce height and speed. Splitting creates progressively harder situations as the screen fills with faster fragments.
+Big meteors split into two medium, medium into two small, and small ones pop. Each size has different bounce height and speed. Splitting creates progressively harder situations as the screen fills with faster meteors.
 
 ![play](screenshots/final_play.png)
 
 ### Powerups
 
-Splitting a meteor has a 40% chance to drop a powerup. Picking one up adds an extra beam at a 30-degree angle (left first, then right). All beams fire simultaneously on release.
+Splitting a meteor has a 40% chance to drop a powerup. Picking one up adds an extra beam at a 30-degree angle (left first, then right).
 
 ![play](screenshots/final_powerup.png)
 
@@ -37,26 +39,17 @@ The ship uses a 4-frame sprite sheet with states for idle, banking left, banking
 
 ### Title, Pause & Debug
 
-Title screen on launch. Press P to pause and view controls. Press D to toggle debug mode, which overlays hitboxes, velocity vectors, and live stats (FPS, entity counts, player state, charge level).
-
 ![Title screen](screenshots/final_title.png)
+Title screen on launch. 
+
 ![Pause/instructions](screenshots/final_puase_instruction.png)
+Press P to pause and view controls/instructions
+
 ![Pause/instructions](screenshots/final_debug.png)
+Press D to toggle debug mode
 
 
 ## Screenshots
-
-### Before (Original PANG)
-
-| Gameplay | Win |
-|----------|-----|
-| ![](screenshots/original_play.png) | ![](screenshots/original_win.png) |
-
-| Game Over | |
-|-----------|--|
-| ![](screenshots/original_lose.png) | |
-
-### After (Space PANG)
 
 | Title | Gameplay |
 |-------|----------|
@@ -68,7 +61,8 @@ Title screen on launch. Press P to pause and view controls. Press D to toggle de
 
 ## List of Resources Used
 
-**Art:** [Kenney.nl Space Shooter Art](https://opengameart.org/content/space-shooter-art) (CC0). Ship sprites, meteor sprites, star background. Medium meteor scaled from big with Excalidraw. Sprite sheet assembled from individual frames with Excalidraw.
+**Art:** 
+- [Kenney.nl Space Shooter Art](https://opengameart.org/content/space-shooter-art): Ship sprites, meteor sprites, star background. Medium meteor scaled from big with **Excalidraw**. Sprite sheet assembled from individual frames with **Excalidraw**.
 
 **Sounds from [Pixabay](https://pixabay.com/)** (Pixabay Content License):
 - Shoot sound (`shoot.mp3`) by ahmed_abdulaal
@@ -80,7 +74,7 @@ Title screen on launch. Press P to pause and view controls. Press D to toggle de
 - Pickup sound (`pickup.wav`)
 - Background music (`space_bgm.wav`)
 
-**Tools:** VLC (audio editing/conversion), [ExcaliDraw](https://excalidraw.com/) (sprite sheet assembly), [uv](https://github.com/astral-sh/uv) (package management)
+**Tools:** [VLC](https://www.videolan.org/) (audio editing/conversion), [ExcaliDraw](https://excalidraw.com/) (sprite sheet assembly), [uv](https://github.com/astral-sh/uv) (package management)
 
 **Frameworks:** [Raylib](https://www.raylib.com/) + [Pyray](https://github.com/electronstudio/raylib-python-cffi)
 
