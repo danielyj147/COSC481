@@ -60,7 +60,7 @@ BALL_SPRITES: dict[BallSize, str] = {
 
 # Music paths
 MUSICS: dict[MusicType, str] = {
-    MusicType.BACKGROUND: os.path.join(ASSET_DIR, "background.mp3"),
+    MusicType.BACKGROUND: os.path.join(ASSET_DIR, "space_bgm.wav"),
 }
 
 SOUNDS: dict[SoundType, str] = {
@@ -500,6 +500,7 @@ class Game:
         # Check victory: all balls inactive
         if all(not ball.active for ball in self.balls) and len(self.balls) > 0:
             self.victory = True
+            play_sound(game_sounds[SoundType.WIN])
 
     # "Private" helper func
     def _check_shoot_ball_collisions(self) -> None:
