@@ -16,15 +16,20 @@ Based on the [C/Raylib PANG](https://github.com/raysan5/raylib-games/blob/master
 
 Holding Space charges a wider beam. The ship switches to its damaged sprite during charge to communicate the energy drain. Releasing fires all available beams at once. Quick taps fire a thin beam with no penalty.
 
-![Gameplay](screenshots/final_play.png)
+![shoot](screenshots/final_shoot.png)
 
 ### Meteor Split
 
 Big meteors split into two medium, medium into two small, and small ones pop. Each size has different bounce height and speed. Splitting creates progressively harder situations as the screen fills with faster fragments.
 
+![play](screenshots/final_play.png)
+
 ### Powerups
 
 Splitting a meteor has a 40% chance to drop a powerup. Picking one up adds an extra beam at a 30-degree angle (left first, then right). All beams fire simultaneously on release.
+
+![play](screenshots/final_powerup.png)
+
 
 ### Sprite Animation
 
@@ -36,20 +41,30 @@ Title screen on launch. Press P to pause and view controls. Press D to toggle de
 
 ![Title screen](screenshots/final_title.png)
 ![Pause/instructions](screenshots/final_puase_instruction.png)
+![Pause/instructions](screenshots/final_debug.png)
+
 
 ## Screenshots
 
 ### Before (Original PANG)
 
-| Gameplay | Win | Game Over |
-|----------|-----|-----------|
-| ![](screenshots/original_play.png) | ![](screenshots/original_win.png) | ![](screenshots/original_lose.png) |
+| Gameplay | Win |
+|----------|-----|
+| ![](screenshots/original_play.png) | ![](screenshots/original_win.png) |
+
+| Game Over | |
+|-----------|--|
+| ![](screenshots/original_lose.png) | |
 
 ### After (Space PANG)
 
-| Title | Gameplay | Pause/Instructions | Game Over |
-|-------|----------|--------------------|-----------|
-| ![](screenshots/final_title.png) | ![](screenshots/final_play.png) | ![](screenshots/final_puase_instruction.png) | ![](screenshots/final_lose.png) |
+| Title | Gameplay |
+|-------|----------|
+| ![](screenshots/final_title.png) | ![](screenshots/final_play.png) |
+
+| Pause/Instructions | Game Over |
+|--------------------|-----------|
+| ![](screenshots/final_puase_instruction.png) | ![](screenshots/final_lose.png) |
 
 ## List of Resources Used
 
@@ -61,20 +76,12 @@ Title screen on launch. Press P to pause and view controls. Press D to toggle de
 - Lose sound (`lose.wav`)
 - Meteor split sound (`split.mp3`)
 
-**Generated sounds** (Python `wave` + `math` modules):
-- Pickup sound (`pickup.wav`), ascending sine tone
-- Background music (`space_bgm.wav`), chiptune in C minor at 140 BPM
+**AI Generated sounds**:
+- Pickup sound (`pickup.wav`)
+- Background music (`space_bgm.wav`)
 
 **Tools:** VLC (audio editing/conversion), [ExcaliDraw](https://excalidraw.com/) (sprite sheet assembly), [uv](https://github.com/astral-sh/uv) (package management)
 
 **Frameworks:** [Raylib](https://www.raylib.com/) + [Pyray](https://github.com/electronstudio/raylib-python-cffi)
 
 **Reference:** [Original PANG in C/Raylib](https://github.com/raysan5/raylib-games/blob/master/classics/src/pang.c) by Ramon Santamaria
-
-## Bonus: If I Had More Time
-
-- **Slow-motion charging:** Scale all entity velocities and gravity by a time factor while charging. Meteors drift in slow motion, stretching the moment of vulnerability and reinforcing the energy drain narrative.
-- **Multiple levels:** Progressive difficulty with more and faster meteors per stage, different meteor types with unique split patterns.
-- **Ship upgrades:** Persistent upgrades between rounds (shield recharge, charge speed, beam customization).
-- **Particle effects:** Explosions on meteor kills, thruster flames, spark trails on beams.
-- **Leaderboard:** Local high score table with initials, arcade-style.
