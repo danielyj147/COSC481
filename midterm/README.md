@@ -2,6 +2,10 @@
 
 A space-themed reimplementation of the classic PANG (Buster Bros) arcade game, built with Python and [Pyray](https://github.com/electronstudio/raylib-python-cffi).
 
+## Video Link
+
+[Google Drive Link](https://drive.google.com/file/d/11yzbYCYpWPzXKDKSg1PcnPRZA3-sH3U6/view?usp=sharing)
+
 ## Game Description
 
 The player controls a spaceship at the bottom of the screen, firing beams upward to destroy bouncing meteors. When a meteor is hit, it splits into two smaller, faster meteors. The goal is to destroy all meteors without getting hit.
