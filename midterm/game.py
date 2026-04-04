@@ -466,8 +466,7 @@ class Game:
             for s in self.shoots:
                 if not s.active:
                     s.fire(self.player, width)
-                    self.player.shoot_timer = PLAYER_SHOOT_ANIM_FRAMES
-                    break
+            self.player.shoot_timer = PLAYER_SHOOT_ANIM_FRAMES
             self.charge_frames = 0
             self.charging = False
 
