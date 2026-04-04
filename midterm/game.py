@@ -602,16 +602,13 @@ class Game:
         if self.screen == GameScreen.INSTRUCTIONS:
             self._draw_centered("HOW TO PLAY", 30, 40, WHITE)
             instructions = [
-                ("[LEFT / RIGHT]  Move spaceship", LIGHTGRAY),
-                ("[SPACE tap]  Fire beam", LIGHTGRAY),
-                ("[SPACE hold]  Charge wider beam - release to fire", LIGHTGRAY),
-                ("[P]  Pause / unpause", LIGHTGRAY),
+                ("[LEFT / RIGHT]  Move", LIGHTGRAY),
+                ("[SPACE]  Fire", LIGHTGRAY),
+                ("[SPACE hold]  Charge", LIGHTGRAY),
+                ("[P]  Pause", LIGHTGRAY),
+                ("[D]  Debug", LIGHTGRAY),
                 ("", LIGHTGRAY),
-                ("Shoot meteors to split them into smaller pieces.", WHITE),
-                ("Destroy all fragments to win.", WHITE),
-                ("If a meteor touches your ship, it's game over.", MAROON),
-                ("", LIGHTGRAY),
-                ("Pick up orange [S] powerups for extra side-angle shots!", ORANGE),
+                ("Pick up [S] powerups for extra side shots!", ORANGE),
             ]
             y = 90
             for line, color in instructions:
@@ -650,16 +647,12 @@ class Game:
                 draw_rectangle(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, fade(BLACK, 0.7))
                 self._draw_centered("PAUSED", 30, 40, WHITE)
                 instructions = [
-                    ("[LEFT / RIGHT]  Move spaceship", LIGHTGRAY),
-                    ("[SPACE tap]  Fire beam", LIGHTGRAY),
-                    ("[SPACE hold]  Charge wider beam - release to fire", LIGHTGRAY),
-                    ("[P]  Unpause    [D]  Toggle debug", LIGHTGRAY),
+                    ("[LEFT / RIGHT]  Move", LIGHTGRAY),
+                    ("[SPACE]  Fire", LIGHTGRAY),
+                    ("[SPACE hold]  Charge", LIGHTGRAY),
+                    ("[P]  Unpause    [D]  Debug", LIGHTGRAY),
                     ("", LIGHTGRAY),
-                    ("Shoot meteors to split them into smaller pieces.", WHITE),
-                    ("Destroy all fragments to win.", WHITE),
-                    ("If a meteor touches your ship, it's game over.", MAROON),
-                    ("", LIGHTGRAY),
-                    ("Pick up orange [S] powerups for extra side-angle shots!", ORANGE),
+                    ("Pick up [S] powerups for extra side shots!", ORANGE),
                 ]
                 y = 90
                 for line, color in instructions:
