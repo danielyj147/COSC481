@@ -105,6 +105,7 @@ class Player:
         self.height: float = 0.0
         self.state: PlayerState = PlayerState.IDLE
         self.shoot_timer: int = 0
+        self.charging: bool = False
         self.spritesheet: Texture | None = None
         self.frame_width: float = 0.0
         self.frame_height: float = 0.0
@@ -125,6 +126,7 @@ class Player:
         self.position = Vector2(WINDOW_WIDTH / 2, WINDOW_HEIGHT)
         self.state = PlayerState.IDLE
         self.shoot_timer = 0
+        self.charging = False
 
     # Enables player.collider_center
     @property
@@ -147,7 +149,10 @@ class Player:
         half_w = self.width / 2
         self.position.x = max(half_w, min(self.position.x, WINDOW_WIDTH - half_w))
 
-        if self.shoot_timer > 0:
+        # Charging drains energy -- ship looks fragile (damaged sprite)
+        if self.charging:
+            self.state = PlayerState.SHOOTING
+        elif self.shoot_timer > 0:
             self.shoot_timer -= 1
             self.state = PlayerState.SHOOTING
         elif moving_left and not moving_right:
@@ -477,6 +482,7 @@ class Game:
 
         if is_key_down(KeyboardKey.KEY_SPACE):
             self.charging = True
+            self.player.charging = True
             self.charge_frames = min(self.charge_frames + 1, CHARGE_MAX)
 
         if is_key_released(KeyboardKey.KEY_SPACE) and self.charging:
@@ -486,6 +492,7 @@ class Game:
                 if not s.active:
                     s.fire(self.player, width)
             self.player.shoot_timer = PLAYER_SHOOT_ANIM_FRAMES
+            self.player.charging = False
             self.charge_frames = 0
             self.charging = False
 
