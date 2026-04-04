@@ -1,14 +1,12 @@
 # Space PANG
 
-A space-themed twist on the classic PANG (Buster Bros) arcade game, built with Python and [Pyray](https://github.com/electronstudio/raylib-python-cffi).
+A space-themed reimplementation of the classic PANG (Buster Bros) arcade game, built with Python and [Pyray](https://github.com/electronstudio/raylib-python-cffi).
 
 ## Game Description
 
-Pilot a spaceship. Blast bouncing meteors. Don't get hit.
+The player controls a spaceship at the bottom of the screen, firing beams upward to destroy bouncing meteors. When a meteor is hit, it splits into two smaller, faster fragments. The goal is to destroy all fragments without getting hit.
 
-Meteors bounce around the screen under gravity. You fire beams upward to destroy them -- but every hit splits a meteor into two smaller, faster ones. Your job is to destroy every last fragment without getting crushed.
-
-The twist? You can hold Space to charge a wider beam, but charging drains your ship's energy -- it visibly weakens, leaving you exposed. Pick up powerups from destroyed meteors to unlock angled side-shots that fire simultaneously with your main beam.
+Charging a beam makes it wider but diverts energy from the ship, leaving it visually damaged and vulnerable. Powerups dropped from destroyed meteors grant additional angled beams that fire simultaneously.
 
 Based on the [C/Raylib PANG](https://github.com/raysan5/raylib-games/blob/master/classics/src/pang.c) by Ramon Santamaria.
 
@@ -16,25 +14,25 @@ Based on the [C/Raylib PANG](https://github.com/raysan5/raylib-games/blob/master
 
 ### Charged Shoot
 
-Hold Space to charge up a wider beam. The longer you hold, the bigger the blast -- but your ship switches to its damaged state while charging, showing it's diverting all energy to weapons. Do you play it safe with quick taps, or risk a big charge to clear a tight cluster?
+Holding Space charges a wider beam. The ship switches to its damaged sprite during charge to communicate the energy drain. Releasing fires all available beams at once. Quick taps fire a thin beam with no penalty.
 
 ![Gameplay](screenshots/final_play.png)
 
 ### Meteor Split
 
-Big meteors split into two medium ones, medium into two small, and small ones just pop. Each size bounces differently -- smaller fragments are faster and harder to dodge. One careless shot can turn a manageable screen into chaos.
+Big meteors split into two medium, medium into two small, and small ones pop. Each size has different bounce height and speed. Splitting creates progressively harder situations as the screen fills with faster fragments.
 
 ### Powerups
 
-Destroying meteors has a chance to drop a powerup. Grab it and you get an extra beam that fires at an angle -- left side first, then right. All your beams fire at the same time, so stacking powerups turns you into a spread-shot machine.
+Splitting a meteor has a 40% chance to drop a powerup. Picking one up adds an extra beam at a 30-degree angle (left first, then right). All beams fire simultaneously on release.
 
 ### Sprite Animation
 
-The ship tilts when you move and looks visibly damaged while charging. It's a small touch but it makes the ship feel alive -- you can tell what's happening at a glance.
+The ship uses a 4-frame sprite sheet with states for idle, banking left, banking right, and damaged (charging). The current state selects the appropriate frame each tick.
 
 ### Title, Pause & Debug
 
-A proper title screen greets you on launch. Press P anytime to pause and see the controls. Press D for debug mode -- hitboxes, velocity vectors, and live stats overlay the game. Handy for understanding (or showing off) the collision and physics systems.
+Title screen on launch. Press P to pause and view controls. Press D to toggle debug mode, which overlays hitboxes, velocity vectors, and live stats (FPS, entity counts, player state, charge level).
 
 ![Title screen](screenshots/final_title.png)
 ![Pause/instructions](screenshots/final_puase_instruction.png)
@@ -55,19 +53,19 @@ A proper title screen greets you on launch. Press P anytime to pause and see the
 
 ## List of Resources Used
 
-**Art:** [Kenney.nl Space Shooter Art](https://opengameart.org/content/space-shooter-art) (CC0) -- ship sprites, meteor sprites, star background. Medium meteor scaled from big with Python Pillow. Sprite sheet assembled from individual frames with Pillow.
+**Art:** [Kenney.nl Space Shooter Art](https://opengameart.org/content/space-shooter-art) (CC0). Ship sprites, meteor sprites, star background. Medium meteor scaled from big with Excalidraw. Sprite sheet assembled from individual frames with Excalidraw.
 
 **Sounds from [Pixabay](https://pixabay.com/)** (Pixabay Content License):
-- Shoot sound (`shoot.mp3`) -- by ahmed_abdulaal
-- Win sound (`win.mp3`) -- by freesound_community
+- Shoot sound (`shoot.mp3`) by ahmed_abdulaal
+- Win sound (`win.mp3`) by freesound_community
 - Lose sound (`lose.wav`)
 - Meteor split sound (`split.mp3`)
 
 **Generated sounds** (Python `wave` + `math` modules):
-- Pickup sound (`pickup.wav`) -- ascending sine tone
-- Background music (`space_bgm.wav`) -- chiptune in C minor at 140 BPM
+- Pickup sound (`pickup.wav`), ascending sine tone
+- Background music (`space_bgm.wav`), chiptune in C minor at 140 BPM
 
-**Tools:** VLC (audio editing/conversion), [Pillow](https://pillow.readthedocs.io/) (sprite sheet assembly), [uv](https://github.com/astral-sh/uv) (package management)
+**Tools:** VLC (audio editing/conversion), [ExcaliDraw](https://excalidraw.com/) (sprite sheet assembly), [uv](https://github.com/astral-sh/uv) (package management)
 
 **Frameworks:** [Raylib](https://www.raylib.com/) + [Pyray](https://github.com/electronstudio/raylib-python-cffi)
 
@@ -75,8 +73,8 @@ A proper title screen greets you on launch. Press P anytime to pause and see the
 
 ## Bonus: If I Had More Time
 
-- **Slow-motion charging:** Slow down game time while charging -- meteors drift, tension builds, and the energy drain narrative hits harder.
-- **Multiple levels:** More meteors, faster speeds, maybe different meteor types with unique split patterns.
-- **Ship upgrades:** Persistent upgrades between rounds -- shield recharge, charge speed, beam customization.
+- **Slow-motion charging:** Scale all entity velocities and gravity by a time factor while charging. Meteors drift in slow motion, stretching the moment of vulnerability and reinforcing the energy drain narrative.
+- **Multiple levels:** Progressive difficulty with more and faster meteors per stage, different meteor types with unique split patterns.
+- **Ship upgrades:** Persistent upgrades between rounds (shield recharge, charge speed, beam customization).
 - **Particle effects:** Explosions on meteor kills, thruster flames, spark trails on beams.
 - **Leaderboard:** Local high score table with initials, arcade-style.
