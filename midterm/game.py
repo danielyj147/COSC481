@@ -51,11 +51,11 @@ BALL_SPLIT: dict[BallSize, BallSize | None] = {
     BallSize.SMALL: None,  # no split
 }
 
-#  Image paths for balls
+# Meteor sprites (Kenney.nl Space Shooter art, CC0 - opengameart.org)
 BALL_SPRITES: dict[BallSize, str] = {
-    BallSize.BIG: os.path.join(ASSET_DIR, "ball_big.png"),
-    BallSize.MEDIUM: os.path.join(ASSET_DIR, "ball_medium.png"),
-    BallSize.SMALL: os.path.join(ASSET_DIR, "ball_small.png"),
+    BallSize.BIG: os.path.join(ASSET_DIR, "meteor_big.png"),
+    BallSize.MEDIUM: os.path.join(ASSET_DIR, "meteor_medium.png"),
+    BallSize.SMALL: os.path.join(ASSET_DIR, "meteor_small.png"),
 }
 
 # Music paths
@@ -71,6 +71,18 @@ SOUNDS: dict[SoundType, str] = {
     SoundType.PICKUP: os.path.join(ASSET_DIR, "pickup.wav"),
 }
 
+class PlayerState(Enum):
+    IDLE = 0
+    MOVING_LEFT = 1
+    MOVING_RIGHT = 2
+    SHOOTING = 3
+
+
+# Sprite sheet: 4 frames (idle, left, right, shoot) in a horizontal strip
+# Source: Kenney.nl Space Shooter art, CC0 - opengameart.org
+SHIP_SPRITESHEET_PATH = os.path.join(ASSET_DIR, "ship_spritesheet.png")
+SHIP_FRAME_COUNT = 4
+
 ball_textures: dict[BallSize, Texture] = {}
 game_musics: dict[MusicType, Music] = {}
 game_sounds: dict[SoundType, Sound] = {}
@@ -80,22 +92,30 @@ class Player:
     def __init__(self) -> None:
         self.position: Vector2 = Vector2(0, 0)
         self.speed: float = PLAYER_SPEED
-        self.texture: Texture | None = None
         self.width: float = 0.0
         self.height: float = 0.0
+        self.state: PlayerState = PlayerState.IDLE
+        self.shoot_timer: int = 0
+        self.spritesheet: Texture | None = None
+        self.frame_width: float = 0.0
+        self.frame_height: float = 0.0
 
     def load_texture(self) -> None:
-        self.texture = load_texture(os.path.join(ASSET_DIR, "player.png"))
-        scale = 40.0 / self.texture.height
-        self.width = self.texture.width * scale
-        self.height = self.texture.height * scale
+        self.spritesheet = load_texture(SHIP_SPRITESHEET_PATH)
+        self.frame_width = self.spritesheet.width / SHIP_FRAME_COUNT
+        self.frame_height = self.spritesheet.height
+        scale = PLAYER_DRAW_HEIGHT / self.frame_height
+        self.width = self.frame_width * scale
+        self.height = self.frame_height * scale
 
     def unload_texture(self) -> None:
-        if self.texture is not None:
-            unload_texture(self.texture)
+        if self.spritesheet is not None:
+            unload_texture(self.spritesheet)
 
     def setup(self) -> None:
         self.position = Vector2(WINDOW_WIDTH / 2, WINDOW_HEIGHT)
+        self.state = PlayerState.IDLE
+        self.shoot_timer = 0
 
     # Enables player.collider_center
     @property
@@ -107,26 +127,42 @@ class Player:
         return min(self.width, self.height) / 2
 
     def update(self) -> None:
-        if is_key_down(KeyboardKey.KEY_LEFT):
+        moving_left = is_key_down(KeyboardKey.KEY_LEFT)
+        moving_right = is_key_down(KeyboardKey.KEY_RIGHT)
+
+        if moving_left:
             self.position.x -= self.speed
-        if is_key_down(KeyboardKey.KEY_RIGHT):
+        if moving_right:
             self.position.x += self.speed
 
         half_w = self.width / 2
         self.position.x = max(half_w, min(self.position.x, WINDOW_WIDTH - half_w))
 
+        if self.shoot_timer > 0:
+            self.shoot_timer -= 1
+            self.state = PlayerState.SHOOTING
+        elif moving_left and not moving_right:
+            self.state = PlayerState.MOVING_LEFT
+        elif moving_right and not moving_left:
+            self.state = PlayerState.MOVING_RIGHT
+        else:
+            self.state = PlayerState.IDLE
+
     def draw(self) -> None:
-        if self.texture is None:
+        if self.spritesheet is None:
             return
+        frame_idx = self.state.value
+        source = Rectangle(
+            frame_idx * self.frame_width, 0, self.frame_width, self.frame_height
+        )
         dest = Rectangle(
             self.position.x,
             self.position.y - self.height,
             self.width,
             self.height,
         )
-        source = Rectangle(0, 0, self.texture.width, self.texture.height)
         draw_texture_pro(
-            self.texture, source, dest, Vector2(self.width / 2, 0), 0.0, WHITE
+            self.spritesheet, source, dest, Vector2(self.width / 2, 0), 0.0, WHITE
         )
 
 
@@ -418,6 +454,7 @@ class Game:
             for s in self.shoots:
                 if not s.active:
                     s.fire(self.player, width)
+                    self.player.shoot_timer = PLAYER_SHOOT_ANIM_FRAMES
                     break
             self.charge_frames = 0
             self.charging = False
@@ -504,13 +541,13 @@ class Game:
 
     def draw(self) -> None:
         if not self.game_over:
+            for s in self.shoots:
+                s.draw()
+
             self.player.draw()
 
             for ball in self.balls:
                 ball.draw()
-
-            for s in self.shoots:
-                s.draw()
 
             for pu in self.powerups:
                 pu.draw()
