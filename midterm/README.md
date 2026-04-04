@@ -1,6 +1,6 @@
 # Space PANG
 
-A space-themed reimplementation of the classic PANG (Buster Bros) arcade game using
+A space-themed reimplementation of the classic PANG arcade game using
 [Pyray](https://github.com/electronstudio/raylib-python-cffi) (Python bindings
 for [Raylib](https://www.raylib.com/)).
 
@@ -11,13 +11,13 @@ Based on the C/Raylib reference implementation by Ramon Santamaria:
 
 **Elevator pitch:** Pilot a spaceship to blast bouncing meteors out of the sky before they crush you.
 
-Meteors bounce around the screen under gravity. The player controls a spaceship at the bottom, firing vertical beams upward to destroy them. When a meteor is hit, it splits into two smaller, faster meteors. Destroy every last fragment to win. Getting touched by any meteor means game over.
+Meteors bounce around the screen under gravity. The player controls a spaceship at the bottom, firing vertical beams("shoots") upward to destroy them. When a meteor is hit, it splits into two smaller, faster meteors. Destroy every last fragment to win. Getting touched by any meteor means game over.
 
-On top of the classic PANG formula, this version adds:
+On top of the classic PANG, this version adds:
 
-- **Charged shots** -- hold the fire key to charge a wider beam that covers more horizontal area.
-- **Powerups** -- splitting meteors sometimes drop powerups that let you fire multiple shots simultaneously.
-- **Sprite-based animation** -- the ship visually tilts when moving and flashes when shooting, driven by a sprite sheet and a `PlayerState` enum.
+- **Charged shots**: hold the fire key(space) to charge a wider beam.
+- **Powerups**: splitting meteors sometimes drop powerups that let you fire multiple shots at the same time.
+- **Animation**: the ship visually tilts when moving and flashes when shooting.
 
 ## Controls
 
