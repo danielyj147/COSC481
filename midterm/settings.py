@@ -32,6 +32,10 @@ SMALL_BALL_BOUNCE_SPEED = -5.0
 # Shoot
 SHOOT_LIFETIME = 120  # frames
 SHOOT_SPEED = 5.0
+SHOOT_BASE_WIDTH = 2.0
+SHOOT_MAX_WIDTH = 20.0
+CHARGE_RATE = 0.3  # width increase per frame while holding space
+CHARGE_MAX = 60  # max charge frames
 
 # Floating points
 MAX_FLOATING_POINTS = 5

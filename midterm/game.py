@@ -135,17 +135,20 @@ class Shoot:
         self.speed: float = 0.0
         self.life_frames: int = 0
         self.active: bool = False
+        self.width: float = SHOOT_BASE_WIDTH
 
     def setup(self) -> None:
         self.active = False
         self.life_frames = 0
+        self.width = SHOOT_BASE_WIDTH
 
-    def fire(self, player: Player) -> None:
+    def fire(self, player: Player, width: float = SHOOT_BASE_WIDTH) -> None:
         self.origin = Vector2(player.position.x, player.position.y)
         self.tip = Vector2(player.position.x, player.position.y - player.height)
         self.speed = PLAYER_SPEED
         self.active = True
         self.life_frames = 0
+        self.width = width
         play_sound(game_sounds[SoundType.SHOOT])
 
     def update(self) -> None:
@@ -160,11 +163,12 @@ class Shoot:
 
     def draw(self) -> None:
         if self.active:
-            draw_line(
-                int(self.origin.x),
-                int(self.origin.y),
-                int(self.tip.x),
+            half_w = self.width / 2
+            draw_rectangle(
+                int(self.origin.x - half_w),
                 int(self.tip.y),
+                int(self.width),
+                int(self.origin.y - self.tip.y),
                 RED,
             )
 
@@ -305,6 +309,7 @@ class Game:
 
         self.player: Player = Player()
 
+        self.max_shoots: int = PLAYER_MAX_SHOOTS
         self.shoots: list[Shoot] = [Shoot() for _ in range(PLAYER_MAX_SHOOTS)]
 
         self.balls: list[Ball] = []
@@ -312,6 +317,9 @@ class Game:
         self.floating_points: list[FloatingPoints] = [
             FloatingPoints() for _ in range(MAX_FLOATING_POINTS)
         ]
+
+        self.charge_frames: int = 0
+        self.charging: bool = False
 
         self.background_music: Music
         self.sound: dict[SoundType, Sound]
@@ -321,6 +329,9 @@ class Game:
         self.game_over = False
         self.victory = False
         self.paused = False
+        self.charge_frames = 0
+        self.charging = False
+        self.max_shoots = PLAYER_MAX_SHOOTS
 
         self.player.setup()
 
@@ -328,6 +339,7 @@ class Game:
         self.background_music = game_musics[MusicType.BACKGROUND]
         play_music_stream(self.background_music)
 
+        self.shoots = [Shoot() for _ in range(self.max_shoots)]
         for s in self.shoots:
             s.setup()
 
@@ -372,11 +384,19 @@ class Game:
 
         self.player.update()
 
-        if is_key_pressed(KeyboardKey.KEY_SPACE):
+        if is_key_down(KeyboardKey.KEY_SPACE):
+            self.charging = True
+            self.charge_frames = min(self.charge_frames + 1, CHARGE_MAX)
+
+        if is_key_released(KeyboardKey.KEY_SPACE) and self.charging:
+            width = SHOOT_BASE_WIDTH + self.charge_frames * CHARGE_RATE
+            width = min(width, SHOOT_MAX_WIDTH)
             for s in self.shoots:
                 if not s.active:
-                    s.fire(self.player)
+                    s.fire(self.player, width)
                     break
+            self.charge_frames = 0
+            self.charging = False
 
         for s in self.shoots:
             s.update()
@@ -414,12 +434,12 @@ class Game:
                 if not ball.active:
                     continue
 
-                # Check if the ball overlaps the shoot's vertical line
-                line_x = shoot.origin.x
+                half_w = shoot.width / 2
+                shoot_left = shoot.origin.x - half_w
+                shoot_right = shoot.origin.x + half_w
                 if (
-                    ball.position.x - ball.radius
-                    <= line_x
-                    <= ball.position.x + ball.radius
+                    shoot_right >= ball.position.x - ball.radius
+                    and shoot_left <= ball.position.x + ball.radius
                     and ball.position.y + ball.radius >= shoot.tip.y
                 ):
                     shoot.active = False
@@ -452,6 +472,14 @@ class Game:
                 fp.draw()
 
             draw_text(f"SCORE: {self.score}", 10, 10, 20, LIGHTGRAY)
+
+            if self.charging:
+                charge_pct = self.charge_frames / CHARGE_MAX
+                bar_width = int(50 * charge_pct)
+                bar_x = int(self.player.position.x - 25)
+                bar_y = int(self.player.position.y - self.player.height - 15)
+                draw_rectangle(bar_x, bar_y, 50, 6, DARKGRAY)
+                draw_rectangle(bar_x, bar_y, bar_width, 6, RED)
 
             if self.victory:
                 title = "YOU WIN!"
