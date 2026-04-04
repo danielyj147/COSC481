@@ -1,4 +1,4 @@
-# Python needs this so Ball can reference itself in type hints. Why....
+# idk why but using Ball as a class requires this.
 from __future__ import annotations
 import math
 import os
@@ -446,7 +446,7 @@ class Game:
                 self.startup()
             return
 
-        # Update floating points FIRST -- they were getting stuck on the gameover screen. Never again.
+        # Updating fp before anything b/c there was a bug where fp gets "stuck" on gameover screen.
         for fp in self.floating_points:
             fp.update()
 
@@ -461,7 +461,7 @@ class Game:
         if is_key_pressed(KeyboardKey.KEY_D):
             self.debug = not self.debug
 
-        # Paused means paused. Go grab a snack.
+        # No need to update anything if paused!
         if self.paused:
             return
 
