@@ -72,9 +72,9 @@ SOUNDS: dict[SoundType, str] = {
     SoundType.PICKUP: os.path.join(ASSET_DIR, "pickup.wav"),
 }
 
+
 class GameScreen(Enum):
     TITLE = "title"
-    INSTRUCTIONS = "instructions"
     PLAYING = "playing"
     GAME_OVER = "game_over"
     VICTORY = "victory"
@@ -443,11 +443,6 @@ class Game:
     def update(self) -> None:
         if self.screen == GameScreen.TITLE:
             if is_key_pressed(KeyboardKey.KEY_ENTER):
-                self.screen = GameScreen.INSTRUCTIONS
-            return
-
-        if self.screen == GameScreen.INSTRUCTIONS:
-            if is_key_pressed(KeyboardKey.KEY_ENTER):
                 self.startup()
             return
 
@@ -568,7 +563,9 @@ class Game:
                     self.balls.extend(children)
 
                     if children and random.random() < POWERUP_DROP_CHANCE:
-                        self.powerups.append(Powerup(Vector2(ball.position.x, ball.position.y)))
+                        self.powerups.append(
+                            Powerup(Vector2(ball.position.x, ball.position.y))
+                        )
 
                     break  # One shoot can only hit one ball
 
@@ -588,7 +585,9 @@ class Game:
                 draw_texture(self.bg_texture, x, y, WHITE)
 
     def _draw_centered(self, text: str, y: int, size: int, color: Color) -> None:
-        draw_text(text, WINDOW_WIDTH // 2 - measure_text(text, size) // 2, y, size, color)
+        draw_text(
+            text, WINDOW_WIDTH // 2 - measure_text(text, size) // 2, y, size, color
+        )
 
     def draw(self) -> None:
         self._draw_background()
@@ -596,26 +595,12 @@ class Game:
         if self.screen == GameScreen.TITLE:
             self._draw_centered("SPACE PANG", 80, 60, WHITE)
             self._draw_centered("Destroy all meteors to survive!", 160, 20, LIGHTGRAY)
-            self._draw_centered("PRESS [ENTER] TO CONTINUE", WINDOW_HEIGHT // 2 + 40, 20, LIGHTGRAY)
-            return
-
-        if self.screen == GameScreen.INSTRUCTIONS:
-            self._draw_centered("HOW TO PLAY", 30, 40, WHITE)
-            instructions = [
-                ("[LEFT / RIGHT]  Move", LIGHTGRAY),
-                ("[SPACE]  Fire", LIGHTGRAY),
-                ("[SPACE hold]  Charge", LIGHTGRAY),
-                ("[P]  Pause", LIGHTGRAY),
-                ("[D]  Debug", LIGHTGRAY),
-                ("", LIGHTGRAY),
-                ("Pick up [S] powerups for extra side shots!", ORANGE),
-            ]
-            y = 90
-            for line, color in instructions:
-                if line:
-                    draw_text(line, 60, y, 18, color)
-                y += 28
-            self._draw_centered("PRESS [ENTER] TO START", WINDOW_HEIGHT - 50, 20, LIGHTGRAY)
+            self._draw_centered(
+                "PRESS [ENTER] TO START", WINDOW_HEIGHT // 2 + 20, 20, LIGHTGRAY
+            )
+            self._draw_centered(
+                "PRESS [P] IN-GAME FOR INSTRUCTIONS", WINDOW_HEIGHT // 2 + 50, 16, GRAY
+            )
             return
 
         if self.screen == GameScreen.PLAYING:
@@ -659,7 +644,9 @@ class Game:
                     if line:
                         draw_text(line, 60, y, 18, color)
                     y += 28
-                self._draw_centered("PRESS [P] TO RESUME", WINDOW_HEIGHT - 50, 20, LIGHTGRAY)
+                self._draw_centered(
+                    "PRESS [P] TO RESUME", WINDOW_HEIGHT - 50, 20, LIGHTGRAY
+                )
 
             if self.debug:
                 self._draw_debug()
@@ -668,13 +655,17 @@ class Game:
         if self.screen == GameScreen.VICTORY:
             self._draw_centered("YOU WIN!", 100, 60, GREEN)
             self._draw_centered(f"FINAL SCORE: {self.score}", 180, 30, WHITE)
-            self._draw_centered("PRESS [ENTER] FOR TITLE", WINDOW_HEIGHT // 2 + 40, 20, LIGHTGRAY)
+            self._draw_centered(
+                "PRESS [ENTER] FOR TITLE", WINDOW_HEIGHT // 2 + 40, 20, LIGHTGRAY
+            )
             return
 
         if self.screen == GameScreen.GAME_OVER:
             self._draw_centered("GAME OVER", 100, 60, MAROON)
             self._draw_centered(f"SCORE: {self.score}", 180, 30, WHITE)
-            self._draw_centered("PRESS [ENTER] FOR TITLE", WINDOW_HEIGHT // 2 + 40, 20, LIGHTGRAY)
+            self._draw_centered(
+                "PRESS [ENTER] FOR TITLE", WINDOW_HEIGHT // 2 + 40, 20, LIGHTGRAY
+            )
 
     def _draw_debug(self) -> None:
         # Player hitbox
@@ -687,14 +678,6 @@ class Game:
             if not ball.active:
                 continue
             draw_circle_lines_v(ball.position, ball.radius, YELLOW)
-            draw_line_v(
-                ball.position,
-                Vector2(
-                    ball.position.x + ball.speed.x * 10,
-                    ball.position.y + ball.speed.y * 10,
-                ),
-                YELLOW,
-            )
 
         # Shoot collision boxes
         for s in self.shoots:
