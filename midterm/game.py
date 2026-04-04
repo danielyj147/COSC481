@@ -31,6 +31,7 @@ class SoundType(Enum):
     LOSE = "lose"
     WIN = "win"
     SPLIT = "split"
+    PICKUP = "pickup"
 
 
 # Properties per size: (radius, points, bounce_speed)
@@ -67,6 +68,7 @@ SOUNDS: dict[SoundType, str] = {
     SoundType.SHOOT: os.path.join(ASSET_DIR, "shoot.mp3"),
     SoundType.WIN: os.path.join(ASSET_DIR, "win.mp3"),
     SoundType.SPLIT: os.path.join(ASSET_DIR, "split.mp3"),
+    SoundType.PICKUP: os.path.join(ASSET_DIR, "pickup.wav"),
 }
 
 ball_textures: dict[BallSize, Texture] = {}
@@ -263,6 +265,25 @@ class Ball:
         ]
 
 
+class Powerup:
+    def __init__(self, position: Vector2) -> None:
+        self.position: Vector2 = Vector2(position.x, position.y)
+        self.active: bool = True
+
+    def update(self) -> None:
+        if not self.active:
+            return
+        self.position.y += POWERUP_FALL_SPEED
+        if self.position.y > WINDOW_HEIGHT + POWERUP_RADIUS:
+            self.active = False
+
+    def draw(self) -> None:
+        if not self.active:
+            return
+        draw_circle_v(self.position, POWERUP_RADIUS, ORANGE)
+        draw_text("S", int(self.position.x - 4), int(self.position.y - 5), 12, WHITE)
+
+
 class FloatingPoints:
     """Animated score text that rises and fades out(NOT decimals)"""
 
@@ -313,6 +334,7 @@ class Game:
         self.shoots: list[Shoot] = [Shoot() for _ in range(PLAYER_MAX_SHOOTS)]
 
         self.balls: list[Ball] = []
+        self.powerups: list[Powerup] = []
 
         self.floating_points: list[FloatingPoints] = [
             FloatingPoints() for _ in range(MAX_FLOATING_POINTS)
@@ -342,6 +364,8 @@ class Game:
         self.shoots = [Shoot() for _ in range(self.max_shoots)]
         for s in self.shoots:
             s.setup()
+
+        self.powerups = []
 
         # Create initial big balls with random positions and non-zero velocities
         self.balls = []
@@ -404,6 +428,22 @@ class Game:
         for ball in self.balls:
             ball.update()
 
+        for pu in self.powerups:
+            pu.update()
+
+        # Check player-powerup collisions
+        for pu in self.powerups:
+            if pu.active and check_collision_circles(
+                self.player.collider_center,
+                self.player.collider_radius,
+                pu.position,
+                POWERUP_RADIUS,
+            ):
+                pu.active = False
+                self.max_shoots += 1
+                self.shoots.append(Shoot())
+                play_sound(game_sounds[SoundType.PICKUP])
+
         # Check player-ball collisions
         for ball in self.balls:
             if ball.active and check_collision_circles(
@@ -450,6 +490,10 @@ class Game:
                     # Split the ball
                     children = ball.split()
                     self.balls.extend(children)
+
+                    if children and random.random() < POWERUP_DROP_CHANCE:
+                        self.powerups.append(Powerup(Vector2(ball.position.x, ball.position.y)))
+
                     break  # One shoot can only hit one ball
 
     def _spawn_floating_points(self, position: Vector2, value: int) -> None:
@@ -467,6 +511,9 @@ class Game:
 
             for s in self.shoots:
                 s.draw()
+
+            for pu in self.powerups:
+                pu.draw()
 
             for fp in self.floating_points:
                 fp.draw()

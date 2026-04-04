@@ -37,6 +37,12 @@ SHOOT_MAX_WIDTH = 20.0
 CHARGE_RATE = 0.3  # width increase per frame while holding space
 CHARGE_MAX = 60  # max charge frames
 
+# Powerups
+POWERUP_DROP_CHANCE = 0.4
+POWERUP_FALL_SPEED = 2.0
+POWERUP_RADIUS = 10.0
+MAX_POWERUPS = 10
+
 # Floating points
 MAX_FLOATING_POINTS = 5
 POINTS_FADE_SPEED = 0.02
